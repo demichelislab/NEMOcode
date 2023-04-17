@@ -1,0 +1,10 @@
+Package: NEMOcode
+Type: Package
+Title: Code to estimate Tumor Content end Phenotype Evidence score from samples sequenced with the NEMO panel 
+Version: 0.1.0
+Author: Gian Marco Franceschini
+Maintainer: Gian Marco Franceschini
+Description: NEMO is a targeted DNA methylation panel for cell-free DNA profiling in castration-resistant prostate cancer patients
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
