@@ -26,3 +26,5 @@ Imports:
     rtracklayer,
     S4Vectors,
     tidyr
+Depends: 
+    R (>= 2.10)

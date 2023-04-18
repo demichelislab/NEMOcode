@@ -9,7 +9,6 @@
 #' @export
 #'
 compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
-
     rownames(reg_df) <- reg_df$reg_id
 
     ## Checks
@@ -18,15 +17,10 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
     assertthat::assert_that(all(reg_df$reg_id %in% rownames(tumor_mat)))
     assertthat::assert_that(all(reg_df$reg_id == rownames(control_mat)))
 
-    ## Based on the selection strategy,
-    ## We assume that their discrete methylation state is opposite in PBMCs and CRPCs # nolint
-
-    ## Separate Hyper and Hypo
-    reg_hyper <- reg_df %>% filter(meth_state == +1) %>% pull(reg_id)
+    reg_hyper <-
+        reg_df %>% filter(meth_state == +1) %>% pull(reg_id)
     reg_hypo <- reg_df %>% filter(meth_state == -1) %>% pull(reg_id)
 
-
-    ## Extract rows and homogenize beta vals - (1-Beta) for hypo sites
     cancer_mat = tumor_mat
     cancer_mat[reg_hypo, ] = 1 - cancer_mat[reg_hypo, ]
 
@@ -35,9 +29,6 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
 
     tc_est_df = cancer_mat - apply(ctrl_mat, 1, median, na.rm = T)
 
-
-    ## Offsets:
-    ## using PBMCs/cfDNA we compute the expected lower and upper values (technical offsets).
 
     if (length(reg_hyper) >= 1) {
         offset_hyper <-
@@ -54,13 +45,7 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
     }
 
     tc_est = apply(tc_est_df, 2, median, na.rm = T)
-
-    ## Stretch the result based on offsets, computed on PBMCs
-    tc_est <- tc_est/ ((1 - offset_hypo) - offset_hyper)
-
-    ## If some values exceed the boundaries, correct
-    ## This can happen due to noise and as the correction is
-    ## based on the average value
+    tc_est <- tc_est / ((1 - offset_hypo) - offset_hyper)
 
     tc_est[which(tc_est < 0)] <- 0
     tc_est[which(tc_est > 1)] <- 1
@@ -81,7 +66,7 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
 #' @param control_mat Matrix of PBMC profiles, regions on rows, samples on columns
 #' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively
 #' @param nsub number of subsampling iterations to estimate stability (default = 100)
-#' @param quant_prob the quantile of probabilities to produce stability interval via subsampling (0.05 = 95% CI)
+#' @param quant_prob the quantile of probabilities to produce stability interval via subsampling (0.05 = 95\% CI)
 #' @param frac_sub the fraction of informative regions to use for subsampling iterations
 #'
 #' @import dplyr tidyr
@@ -93,12 +78,12 @@ compute_ci_confidence = function(tumor_mat,
                                  nsub = 100,
                                  quant_prob = .05,
                                  frac_sub = .5) {
-    requireNamespace(tidyverse)
+    requireNamespace(dplyr)
+    requireNamespace(tidyr)
 
     ll_bt = list()
 
     for (i in seq(1:nsub)) {
-
         message(i)
 
         keep_ = sample(1:nrow(tumor_mat),
@@ -114,7 +99,8 @@ compute_ci_confidence = function(tumor_mat,
         tc_bt = data.frame(
             SampleName = names(tc_bt$tc_est),
             meth_est = tc_bt$tc_est,
-            bt = i)
+            bt = i
+        )
 
         rownames(tc_bt) = NULL
         ll_bt[[paste0("bt_", i)]] = tc_bt
@@ -148,7 +134,8 @@ compute_ci_confidence = function(tumor_mat,
             ci_lower = .clamp_val(q025_tc, 0, 1),
             ci_upper = .clamp_val(q975_tc, 0, 1),
             est_min = .clamp_val(est_min, 0, 1),
-            est_max = .clamp_val(est_max, 0, 1))
+            est_max = .clamp_val(est_max, 0, 1)
+        )
 
     return(tc_est_ci)
 
@@ -187,8 +174,12 @@ compute_evidence_brms = function(obs,
                                  tc,
                                  tc_lw,
                                  tc_up) {
-    if (is.na(tc) | is.nan(tc) | tc == 0) {
+    assertthat::are_equal(length(obs), length(cf_mu))
+    assertthat::assert_that((tc <= 1 &
+                                 tc >= 0) | is.na(tc) | is.nan(tc))
 
+    ## Handle the case in which tumor content is missing or zero
+    if (is.na(tc) | is.nan(tc) | tc == 0) {
         res = data.frame(
             immune = 1 - tc,
             adeno = NA,
@@ -198,27 +189,25 @@ compute_evidence_brms = function(obs,
         )
 
     } else {
-
         refm = as.matrix(data.frame(cf_mu, ad_mu, ne_mu))
         rownames(refm) = paste0("idx", seq(1, nrow(refm)))
 
         wgh = 1 / (ad_sd + ne_sd)
-        wgh = wgh*(1/max(wgh))
+        wgh = wgh * (1 / max(wgh))
 
         dfin = data.frame(obs, refm, wgh)
 
-        suppressPackageStartupMessages(base::library(brms))
+        loadNamespace(brms)
 
         priors <- c(
-            prior(normal(1 - tc, 0.01), coef = "cf_mu"), # Strongly informative, as TC is known
-            prior(normal(tc / 2, .5), coef = "ad_mu"), # Uninformative
-            prior(normal(tc / 2, .5), coef = "ne_mu") # Uninformative
+            prior(normal(1 - tc, 0.01), coef = "cf_mu"),
+            prior(normal(tc / 2, .5), coef = "ad_mu"),
+            prior(normal(tc / 2, .5), coef = "ne_mu")
         )
 
         idata = na.omit(dfin)
 
         if (TRUE) {
-
             ## Linear or quadratic weighting based on variance in the reference
             brm.1 <- brm(
                 obs | weights(wgh) ~ cf_mu + ad_mu + ne_mu - 1,
@@ -253,14 +242,15 @@ compute_evidence_brms = function(obs,
 
         outp = fixef(brm.1, robust = T)[, 1]
 
-        ## Negative weights should go to zero, weights of more than 1 are normalized to sum to 1
-
+        # Clamp values to avoid extreme or negative fractions
         p_ne = .clamp_val(outp["ne_mu"], 0, 2)
         p_adeno = .clamp_val(outp["ad_mu"], 0 , 2)
         cc = .clamp_val(outp["cf_mu"], 0, 2)
 
+        # Normalize to one the fraction
         nrm_out = norm_one(c(p_ne, p_adeno, cc))
 
+        # Extract fractions
         p_ne = nrm_out[1]
         p_adeno = nrm_out[2]
         cc = nrm_out[3]
@@ -268,12 +258,13 @@ compute_evidence_brms = function(obs,
         ## The relative error is computed as the maximum deviation across the three parameters,
         ## divided by the total tumor content
 
-        var_score =  2*max(fixef(brm.1, robust = T)[, 2])
+        var_score =  2 * max(fixef(brm.1, robust = T)[, 2])
         # rel_error =  var_score / (p_ne + p_adeno)
 
         ## Compute the reconstruction loss as a goodness of fit metric
-        pred = (idata[,4]*p_ne)+(idata[,3]*p_adeno)+(idata[,2]*cc)
-        rmse_recons = Metrics::rmse(idata[,1], pred)
+        pred = (idata[, 4] * p_ne) + (idata[, 3] * p_adeno) + (idata[, 2] * cc)
+
+        rmse_recons = Metrics::rmse(idata[, 1], pred)
         rel_error = rmse_recons
 
         res = data.frame(
@@ -299,7 +290,7 @@ compute_evidence_brms = function(obs,
 #' @param atlas_tc A data.frame with previously computed tumor content estimation for each sample
 #' @param ref_mat A matrix with mean and sd DNA methylation for each cell-type of interest and each region
 #' @param atlas_samples List of samples for which the TC should be considered 1 regardless of the estimation
-#' @param cfdna_ids List of samples for which healthy cfDNA should be used as background, instead of PBMCs
+#' @param cfdna_ids List of samples for which healthy cfDNA should be used as background, instead of PBMCs (default)
 #' @param mode Deconvolution strategy used, default to brms Bayesian regression (Stan backend)
 #' @param sequential execute the computation sequentially (for debugging purpose)
 #' @param nclust Number of cluster for parallel computation
@@ -307,9 +298,14 @@ compute_evidence_brms = function(obs,
 #' @import parallel doParallel
 #' @return A data.frame with PE score
 #' @export
-compute_all = function(dd, atlas_tc, ref_mat, atlas_samples, cfdna_ids, mode = "brms", sequential = FALSE, nclust = 4) {
-
-
+compute_all = function(dd,
+                       atlas_tc,
+                       ref_mat,
+                       atlas_samples,
+                       cfdna_ids,
+                       mode = "brms",
+                       sequential = FALSE,
+                       nclust = 4) {
     if (!sequential) {
         cl <- makeCluster(nclust)
         registerDoParallel(cl)
@@ -317,15 +313,23 @@ compute_all = function(dd, atlas_tc, ref_mat, atlas_samples, cfdna_ids, mode = "
         registerDoSEQ()
     }
 
+    if (mode == "brms") {
+        deconv_fun = compute_evidence_brms
+    } else {
+        message(
+            "Current deconvolution options include only bayesian regression (brms). Future options might be implemented."
+        )
+        stop()
+    }
+
     est_all = foreach(
         i = 1:ncol(dd),
         .combine = rbind,
-        .packages = c("dplyr"), .export = c("deconv_fun"),
+        .packages = c("dplyr"),
+        .export = c("deconv_fun")
     ) %dopar% {
 
-        # source("/shares/CIBIO-Storage/CO/SPICE/gianmarco/meth_collection/script/F_estimates.R")
         `%!in%` <- Negate(`%in%`)
-
         nn = colnames(dd)[i]
         message(nn)
 
@@ -341,16 +345,7 @@ compute_all = function(dd, atlas_tc, ref_mat, atlas_samples, cfdna_ids, mode = "
         }
 
 
-        if (mode == "brms"){
-            deconv_fun = compute_evidence_brms
-        } else {
-            message("Current deconvolution options include only bayesian regression (brms). Future options might be implemented.")
-            stop()
-        }
-
-
         if (!length(tcs) == 0) {
-
             if (nn %!in% cfdna_ids) {
                 tern = deconv_fun(
                     obs = dd[, i],
@@ -368,9 +363,7 @@ compute_all = function(dd, atlas_tc, ref_mat, atlas_samples, cfdna_ids, mode = "
                 tern$SampleName = nn
                 return(tern)
 
-
             } else {
-
                 tern = deconv_fun(
                     obs = dd[, i],
                     cf_mu = ref_mat$cf_mu,
@@ -423,16 +416,16 @@ compute_all = function(dd, atlas_tc, ref_mat, atlas_samples, cfdna_ids, mode = "
 #' @return A data.frame with complete estimations
 #' @export
 #'
-format_score = function(score_df, limit = 0.05){
-
+format_score = function(score_df, limit = 0.03) {
     # Compute final evidence
 
     score_ss = score_df %>%
         mutate(
-            pes = ne/(ne+adeno),
-            pes_lw = ne/(ne+adeno),
-            pes_up = ne/(ne+adeno),
-            quality_flag = est_mu > limit) %>%
+            pes = ne / (ne + adeno),
+            pes_lw = ne / (ne + adeno),
+            pes_up = ne / (ne + adeno),
+            quality_flag = est_mu > limit
+        ) %>%
         select(
             SampleName,
             file_id,
@@ -454,7 +447,6 @@ format_score = function(score_df, limit = 0.05){
         )
 
     ## If score is below the limit of detection, set to NA
-
     score_ss$pes = with(score_ss, ifelse(tc_est < limit, NA, pes))
     score_ss$pes_lw = with(score_ss, ifelse(tc_est < limit, NA, pes_lw))
     score_ss$pes_up = with(score_ss, ifelse(tc_est < limit, NA, pes_up))

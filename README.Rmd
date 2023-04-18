@@ -13,16 +13,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# NEMOcode
+# Companion code for the NEMO sequencing panel
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of NEMOcode is to ...
-
 ## Installation
 
-You can install the development version of NEMOcode from [GitHub](https://github.com/) with:
+You can install the current version of NEMOcode from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -46,13 +44,13 @@ These scripts have been tested with R version `4.1.2`.
 ### Data availability
 
 Preprocessed data are available in Zenodo [link](link).
-Raw data are available from GEO (NEMO panel) and SRA (WGBS).
+Raw data are available from GEO (NEMO panel) and SRA (WGBS, phs001752.v2-ctDNA_NE_CRPC_v2).
 
-To reproduce the analysis...
+A minimal guide to obtain NEMO estimation from raw data is outlined below.
 
 ### Data preparation
 
-Data has been processed using a standard pipeline for DNA methylation (`nf-core/methylseq`, version 1.6). DNA methylation counts in bismark format and hg19 coordinates are required as a starting input. Other types of inputs can be adapted, provided that per CpG DNA methylation counts are available. Examples of such input files can be found in `data/raw`. The first function `collapse_beta()` uses the input counts to estimate a region-wise DNA methylation value (Beta). For each sample and each region in the NEMO design, the average Beta value is computed as the fraction of methylated CpGs over the total (first per CpG, then per region), keeping only CpG sites with coverage greater than 10. The result of this step is a matrix with samples in the columns and NEMO regions in rows. 
+Data has been processed using a standard pipeline for DNA methylation (`nf-core/methylseq`, version 1.6). DNA methylation counts in bismark format and hg19 coordinates are required as a starting input. Other types of inputs can be adapted, provided that per CpG DNA methylation counts are available. Examples of such input files can be found in `inst/dataext/rawcov`. The first function `collapse_beta()` uses the input counts to estimate a region-wise DNA methylation value (Beta). For each sample and each region in the NEMO design, the average Beta value is computed as the fraction of methylated CpGs over the total (first per CpG, then per region), keeping only CpG sites with coverage greater than 10. The result of this step is a matrix with samples in the columns and NEMO regions in rows. 
 
 ### Inference of Tumor Content
 
@@ -61,7 +59,7 @@ Data has been processed using a standard pipeline for DNA methylation (`nf-core/
 
 ### Inference of PE score
 
-Once the tumor content is known, the main goal of the analysis is to infer the presence of CRPC-NE derived DNA. As differential DNA methylation between CRPC-Adeno and CRPC-NE has been previously characterized, we leverage a set of informative regions to achieve this goal. The inference procedure builds upon the tumor content estimation and aims at reconstructing the observed signal as a linear combination of CRPC-NE, CRPC-Adeno, and healthy cfDNA signal. To this end, an atlas with reference profiles generated with high tumor-content tissue samples has been generated and is available in the `resource` folder. The reconstruction task is performed through a Bayesian linear regression `compute_all()`, which computes the most likely fractions of each cell type. A strong prior is used for the healthy cfDNA signal, as it is equal to 2 - Tumor content, while a non-informative prior is used for the NE and Adeno components. The relative error of the estimation is computed as the maximum standerd error across NE and Adeno fractions, divided by the total tumor content. The PE score is not reliable when the tumor content is below 5%, while we recommend caution in interpreting the PE score between 5% and 10% of TC. 
+Once the tumor content is known, the main goal of the analysis is to infer the presence of CRPC-NE derived DNA. As differential DNA methylation between CRPC-Adeno and CRPC-NE has been previously characterized, we leverage a set of informative regions to achieve this goal. The inference procedure builds upon the tumor content estimation and aims at reconstructing the observed signal as a linear combination of CRPC-NE, CRPC-Adeno, and healthy cfDNA signal. To this end, an atlas with reference profiles generated with high tumor-content tissue samples has been generated and is available in the `resource` folder. The reconstruction task is performed through a Bayesian linear regression `compute_all()`/`compute_evidence_brms()`, which computes the most likely fractions of each cell type. A strong prior is used for the healthy cfDNA signal, as it is equal to $(1 - TC)$, while a non-informative prior is used for the NE and Adeno components. The relative error of the estimation is computed as the maximum standerd error across NE and Adeno fractions, divided by the total tumor content. The PE score is not reliable when the tumor content is below 5%, while we recommend caution in interpreting the PE score between 5% and 10% of TC. 
 
 
 
@@ -70,18 +68,3 @@ library(NEMOcode)
 ## basic example code
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/v1/examples>.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.

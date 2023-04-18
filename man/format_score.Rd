@@ -4,7 +4,7 @@
 \alias{format_score}
 \title{Compute final scores from deconvolved fractions}
 \usage{
-format_score(score_df, limit = 0.05)
+format_score(score_df, limit = 0.03)
 }
 \arguments{
 \item{score_df}{input data.frame}

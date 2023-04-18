@@ -24,7 +24,7 @@ compute_all(
 
 \item{atlas_samples}{List of samples for which the TC should be considered 1 regardless of the estimation}
 
-\item{cfdna_ids}{List of samples for which healthy cfDNA should be used as background, instead of PBMCs}
+\item{cfdna_ids}{List of samples for which healthy cfDNA should be used as background, instead of PBMCs (default)}
 
 \item{mode}{Deconvolution strategy used, default to brms Bayesian regression (Stan backend)}
 

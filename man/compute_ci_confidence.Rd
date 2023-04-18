@@ -22,7 +22,7 @@ compute_ci_confidence(
 
 \item{nsub}{number of subsampling iterations to estimate stability (default = 100)}
 
-\item{quant_prob}{the quantile of probabilities to produce stability interval via subsampling (0.05 = 95% CI)}
+\item{quant_prob}{the quantile of probabilities to produce stability interval via subsampling (0.05 = 95\% CI)}
 
 \item{frac_sub}{the fraction of informative regions to use for subsampling iterations}
 }

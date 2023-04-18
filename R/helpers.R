@@ -1,5 +1,3 @@
-
-
 #' Probit transformation
 #'
 #' @param x beta values
