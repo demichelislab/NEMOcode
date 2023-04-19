@@ -11,6 +11,7 @@ LazyData: true
 URL: https://github.com/GMFranceschini/NEMOcode
 BugReports: https://github.com/GMFranceschini/NEMOcode/issues
 Suggests: 
+    covr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.2.3

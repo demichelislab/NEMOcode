@@ -4,11 +4,14 @@
 # Companion code for the NEMO sequencing panel
 
 <!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/GMFranceschini/NEMOcode/branch/master/graph/badge.svg)](https://app.codecov.io/gh/GMFranceschini/NEMOcode?branch=master)
 <!-- badges: end -->
 
 ## Installation
 
-You can install the development version of NEMOcode from
+You can install the current version of NEMOcode from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -27,7 +30,8 @@ The NEMO-panel is a tailored sequencing assay to monitor CRPC through
 cell-free DNA (cfDNA) methylation and ultimately provide detection of
 treatment-induced neuroendocrine prostate cancer. Starting from DNA
 methylation counts obtained from BS-seq techniques, the following steps
-estimate those clinically relevant quantities.
+estimate those clinically relevant quantities. For more details, please
+see the original manuscript [link](link).
 
 Notice that, in principle, masked whole genome bisulfite sequencing data
 can be used to generate per-region Beta values, even though the signal
@@ -44,7 +48,8 @@ These scripts have been tested with R version `4.1.2`.
 ### Data availability
 
 Preprocessed data are available in Zenodo [link](link). Raw data are
-available from GEO (NEMO panel) and SRA (WGBS).
+available from GEO (NEMO panel) and SRA (WGBS,
+phs001752.v2-ctDNA_NE_CRPC_v2).
 
 A minimal guide to obtain NEMO estimation from raw data is outlined
 below.
@@ -52,17 +57,17 @@ below.
 ### Data preparation
 
 Data has been processed using a standard pipeline for DNA methylation
-(`nf-core/methylseq`, version 1.6). DNA methylation counts in bismark
-format and hg19 coordinates are required as a starting input. Other
-types of inputs can be adapted, provided that per CpG DNA methylation
-counts are available. Examples of such input files can be found in
-`dataext/raw`. The first function `collapse_beta()` uses the input
-counts to estimate a region-wise DNA methylation value (Beta). For each
-sample and each region in the NEMO design, the average Beta value is
-computed as the fraction of methylated CpGs over the total (first per
-CpG, then per region), keeping only CpG sites with coverage greater than
-10. The result of this step is a matrix with samples in the columns and
-NEMO regions in rows.
+(`nf-core/methylseq`, version 1.6 [link](link)). DNA methylation counts
+in bismark format and hg19 coordinates are required as a starting input.
+Other types of inputs can be adapted, provided that per CpG DNA
+methylation counts are available. Examples of such input files can be
+found in `inst/dataext/rawcov`. The first function `collapse_beta()`
+uses the input counts to estimate a region-wise DNA methylation value
+(Beta). For each sample and each region in the NEMO design, the average
+Beta value is computed as the fraction of methylated CpGs over the total
+(first per CpG, then per region), keeping only CpG sites with coverage
+greater than 10. The result of this step is a matrix with samples in the
+columns and NEMO regions in rows.
 
 ### Inference of Tumor Content
 

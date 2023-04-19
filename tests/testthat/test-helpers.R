@@ -1,3 +1,9 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that("norm works", {
+  expect_equal(sum(norm_one(c(1,2,3,4,5))), 1)
 })
+
+test_that("clamp works", {
+    clmp = .clamp_val(rnorm(100), 0, 1)
+    expect_true(max(clmp)-min(clmp) <= 1)
+})
+
