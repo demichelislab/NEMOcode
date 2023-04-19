@@ -64,7 +64,7 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
 #'
 #' @param tumor_mat Matrix of tumor samples in which estimate IC fraction, regions on rows, samples on columns
 #' @param control_mat Matrix of PBMC profiles, regions on rows, samples on columns
-#' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively
+#' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth_state (-1/+1) for hypo and hyper respectively
 #' @param nsub number of subsampling iterations to estimate stability (default = 100)
 #' @param quant_prob the quantile of probabilities to produce stability interval via subsampling (0.05 = 95\% CI)
 #' @param frac_sub the fraction of informative regions to use for subsampling iterations

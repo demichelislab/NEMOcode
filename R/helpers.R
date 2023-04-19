@@ -1,17 +1,3 @@
-#' Probit transformation
-#'
-#' @param x beta values
-#' @param multiplier the number that multiplies -x at the exponent (default is 1)
-#'
-#' @return probit transformed value
-#' @export
-.probit_trans = function(x, multiplier = 1) {
-    res = 1 / (1 + exp(-x * multiplier))
-    return(res)
-}
-
-
-
 #' Clamp values
 #'
 #' @param vec a vector to clamp
@@ -53,7 +39,6 @@
 }
 
 
-
 #' Normalize to 1
 #'
 #' @param x numeric vector
@@ -61,4 +46,26 @@
 #' @return a normalized numeric vector
 norm_one <- function(x){
     x/sum(x)
+}
+
+
+#' Beta sine transform
+#'
+#' @param beta
+#'
+#' @return transformed vector
+#' @export
+siTr = function(beta){
+    return(asin((2*beta) - 1))
+}
+
+
+#' Inverse Beta-sine transform
+#'
+#' @param x
+#'
+#' @return transformed vector
+#' @export
+invSi = function(x){
+    return((sin(x)+1)/2)
 }

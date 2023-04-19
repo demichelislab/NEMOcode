@@ -7,3 +7,7 @@ test_that("clamp works", {
     expect_true(max(clmp)-min(clmp) <= 1)
 })
 
+test_that("beta sin works", {
+    x = .5
+    expect_true(x == invSi(siTr(x)))
+})
