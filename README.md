@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Codecov test
-coverage](https://codecov.io/gh/GMFranceschini/NEMOcode/branch/master/graph/badge.svg)](https://app.codecov.io/gh/GMFranceschini/NEMOcode?branch=master)
+coverage](https://codecov.io/gh/GMFranceschini/NEMOcode/branch/master/graph/badge.svg)](https://app.codecov.io/gh/GMFranceschini/NEMOcode)
 <!-- badges: end -->
 
 ## Installation

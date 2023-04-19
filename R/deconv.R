@@ -78,8 +78,8 @@ compute_ci_confidence = function(tumor_mat,
                                  nsub = 100,
                                  quant_prob = .05,
                                  frac_sub = .5) {
-    requireNamespace(dplyr)
-    requireNamespace(tidyr)
+    # requireNamespace(dplyr)
+    # requireNamespace(tidyr)
 
     ll_bt = list()
 
@@ -197,7 +197,7 @@ compute_evidence_brms = function(obs,
 
         dfin = data.frame(obs, refm, wgh)
 
-        loadNamespace(brms)
+        # loadNamespace("brms")
 
         priors <- c(
             prior(normal(1 - tc, 0.01), coef = "cf_mu"),
@@ -295,7 +295,7 @@ compute_evidence_brms = function(obs,
 #' @param sequential execute the computation sequentially (for debugging purpose)
 #' @param nclust Number of cluster for parallel computation
 #'
-#' @import parallel doParallel
+#' @import parallel doParallel foreach
 #' @return A data.frame with PE score
 #' @export
 compute_all = function(dd,
@@ -306,6 +306,7 @@ compute_all = function(dd,
                        mode = "brms",
                        sequential = FALSE,
                        nclust = 4) {
+
     if (!sequential) {
         cl <- makeCluster(nclust)
         registerDoParallel(cl)
@@ -322,7 +323,9 @@ compute_all = function(dd,
         stop()
     }
 
-    est_all = foreach(
+    `%dopar%` <- foreach::`%dopar%`
+
+    est_all = foreach::foreach(
         i = 1:ncol(dd),
         .combine = rbind,
         .packages = c("dplyr"),

@@ -172,13 +172,7 @@ uniform_input = function(file_in,
             select(mp, start, end, strand, meth, cov)
 
 
-        ## Map those chr ids into the good ones
-        ## TODO
-        chrmap = fread(
-            "/shares/CIBIO-Storage/CO/SPICE/downloads/feng2020/meta/contigs_hg38p13.tsv",
-            sep = "\t",
-            skip = 2
-        )
+        chrmap = NEMOcode::contigs_hg38
 
         chrmap = chrmap %>% select(mp = V4, chr = V1) %>%
             filter(chr != "unplaced")
