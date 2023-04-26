@@ -9,7 +9,6 @@
 #' @export
 #'
 compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
-
     rownames(reg_df) <- reg_df$reg_id
 
     ## Checks
@@ -23,24 +22,24 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
     reg_hypo <- reg_df %>% filter(meth_state == -1) %>% pull(reg_id)
 
     cancer_mat = tumor_mat
-    cancer_mat[reg_hypo,] = 1 - cancer_mat[reg_hypo,]
+    cancer_mat[reg_hypo, ] = 1 - cancer_mat[reg_hypo, ]
 
     ctrl_mat = control_mat
-    ctrl_mat[reg_hypo,] = 1 - ctrl_mat[reg_hypo,]
+    ctrl_mat[reg_hypo, ] = 1 - ctrl_mat[reg_hypo, ]
 
     tc_est_df = cancer_mat - apply(ctrl_mat, 1, median, na.rm = T)
 
 
     if (length(reg_hyper) >= 1) {
         offset_hyper <-
-            median(apply(ctrl_mat[reg_hyper, ], 1, mean, na.rm = T))
+            median(apply(ctrl_mat[reg_hyper,], 1, mean, na.rm = T))
     } else {
         offset_hyper = 0
     }
 
     if (length(reg_hypo) >= 1) {
         offset_hypo <-
-            median(apply(ctrl_mat[reg_hypo, ], 1, mean, na.rm = T))
+            median(apply(ctrl_mat[reg_hypo,], 1, mean, na.rm = T))
     } else {
         offset_hypo = 0
     }
@@ -79,8 +78,6 @@ compute_ci_confidence = function(tumor_mat,
                                  nsub = 100,
                                  quant_prob = .05,
                                  frac_sub = .5) {
-
-
     assertthat::are_equal(nrow(tumor_mat), nrow(control_mat))
     assertthat::are_equal(nrow(tumor_mat), nrow(reg_df))
 
@@ -94,9 +91,9 @@ compute_ci_confidence = function(tumor_mat,
                        size = round(nrow(reg_df) * frac_sub),
                        replace = F)
 
-        tumor_bt = tumor_mat[keep_, ]
-        control_bt = control_mat[keep_, ]
-        reg_bt = reg_df[keep_, ]
+        tumor_bt = tumor_mat[keep_,]
+        control_bt = control_mat[keep_,]
+        reg_bt = reg_df[keep_,]
 
         tc_bt = compute_ic_meth(tumor_bt, control_bt, reg_bt)
 
@@ -178,7 +175,6 @@ compute_evidence_brms = function(obs,
                                  tc,
                                  tc_lw,
                                  tc_up) {
-
     # assertthat::are_equal(length(obs), length(cf_mu))
     # assertthat::assert_that((tc <= 1 & tc >= 0) | is.na(tc) | is.nan(tc))
     # assertthat::assert_that(between(cf_mu, 0, 1))
@@ -296,7 +292,6 @@ compute_all = function(dd,
                        sequential = FALSE,
                        nclust = 4,
                        limit = 0.03) {
-
     cl <- makeCluster(nclust)
 
     if (!sequential) {
@@ -352,10 +347,6 @@ compute_all = function(dd,
                     tc_lw = tc_lw,
                     tc_up = tc_up
                 )
-
-                tern$SampleName = nn
-                return(tern)
-
             } else {
                 tern = deconv_fun(
                     obs = dd[, i],
@@ -369,13 +360,12 @@ compute_all = function(dd,
                     tc_lw = tc_lw,
                     tc_up = tc_up
                 )
-
-                tern$SampleName = nn
-                return(tern)
-
             }
 
-        } else{
+            tern$SampleName = nn
+            return(tern)
+
+        } else {
             tern = data.frame(
                 immune = NA,
                 adeno = NA,
@@ -384,7 +374,6 @@ compute_all = function(dd,
                 var_score = NA,
                 SampleName = nn
             )
-
             return(tern)
         }
     }
@@ -398,8 +387,8 @@ compute_all = function(dd,
             pes_lw = ne / (ne + adeno),
             pes_up = ne / (ne + adeno),
             tc_est = atlas_tc$est_mu,
-            tc_lw = atlas_tc$ci_upper,
-            tc_up = atlas_tc$ci_lower
+            tc_lw = atlas_tc$ci_lower,
+            tc_up = atlas_tc$ci_upper
         ) %>%
         mutate(
             pes = ifelse(tc_est < limit, NA, pes),
@@ -411,5 +400,3 @@ compute_all = function(dd,
     return(est_all)
 
 }
-
-
