@@ -1,5 +1,4 @@
 test_that("compute_ci_confidence works", {
-
     ref = NEMOcode::refDist
     obs = ref$adm_mu
     control = ref$adm_mu
@@ -9,11 +8,44 @@ test_that("compute_ci_confidence works", {
 
     rownames(tumor_mat) <- rownames(control_mat) <- ref$reg_id
 
-    state = data.frame(reg_id = rownames(tumor_mat), meth_state = sample(x = c(-1,1), size = nrow(control_mat), replace = T))
+    state = data.frame(
+        reg_id = rownames(tumor_mat),
+        meth_state = sample(
+            x = c(-1, 1),
+            size = nrow(control_mat),
+            replace = T
+        )
+    )
 
-    res = compute_ci_confidence(tumor_mat, control_mat, reg_df = state, nsub = 10, quant_prob = 0.05, frac_sub = 0.5)
+    res = compute_ci_confidence(
+        tumor_mat,
+        control_mat,
+        reg_df = state,
+        nsub = 10,
+        quant_prob = 0.05,
+        frac_sub = 0.5
+    )
 
     expect_true(typeof(res) == "list")
     expect_false(any(is.na(res)))
+
+})
+
+test_that("compute_brms_works", {
+
+    ref = NEMOcode::refDist
+
+    dd = cbind(ne = ref$ne_mu, cf_mu = ref$cf_mu)
+
+    atlas_tc = data.frame(
+        SampleName = colnames(dd),
+        est_mu = c(1, 0),
+        ci_upper = c(1, 0),
+        ci_lower = c(1, 0)
+    )
+
+    atlas_samples = c()
+    cfdna_ids = c("cf_mu")
+    res = suppressWarnings(compute_all(dd, atlas_tc, ref, atlas_samples, cfdna_ids, nclust = 2))
 
 })

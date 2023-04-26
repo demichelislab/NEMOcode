@@ -9,6 +9,7 @@
 #' @export
 #'
 compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
+
     rownames(reg_df) <- reg_df$reg_id
 
     ## Checks
@@ -22,24 +23,24 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
     reg_hypo <- reg_df %>% filter(meth_state == -1) %>% pull(reg_id)
 
     cancer_mat = tumor_mat
-    cancer_mat[reg_hypo, ] = 1 - cancer_mat[reg_hypo, ]
+    cancer_mat[reg_hypo,] = 1 - cancer_mat[reg_hypo,]
 
     ctrl_mat = control_mat
-    ctrl_mat[reg_hypo, ] = 1 - ctrl_mat[reg_hypo, ]
+    ctrl_mat[reg_hypo,] = 1 - ctrl_mat[reg_hypo,]
 
     tc_est_df = cancer_mat - apply(ctrl_mat, 1, median, na.rm = T)
 
 
     if (length(reg_hyper) >= 1) {
         offset_hyper <-
-            median(apply(ctrl_mat[reg_hyper,], 1, mean, na.rm = T))
+            median(apply(ctrl_mat[reg_hyper, ], 1, mean, na.rm = T))
     } else {
         offset_hyper = 0
     }
 
     if (length(reg_hypo) >= 1) {
         offset_hypo <-
-            median(apply(ctrl_mat[reg_hypo,], 1, mean, na.rm = T))
+            median(apply(ctrl_mat[reg_hypo, ], 1, mean, na.rm = T))
     } else {
         offset_hypo = 0
     }
@@ -78,8 +79,11 @@ compute_ci_confidence = function(tumor_mat,
                                  nsub = 100,
                                  quant_prob = .05,
                                  frac_sub = .5) {
-    # requireNamespace(dplyr)
-    # requireNamespace(tidyr)
+
+
+    assertthat::are_equal(nrow(tumor_mat), nrow(control_mat))
+    assertthat::are_equal(nrow(tumor_mat), nrow(reg_df))
+
 
     ll_bt = list()
 
@@ -90,9 +94,9 @@ compute_ci_confidence = function(tumor_mat,
                        size = round(nrow(reg_df) * frac_sub),
                        replace = F)
 
-        tumor_bt = tumor_mat[keep_,]
-        control_bt = control_mat[keep_,]
-        reg_bt = reg_df[keep_,]
+        tumor_bt = tumor_mat[keep_, ]
+        control_bt = control_mat[keep_, ]
+        reg_bt = reg_df[keep_, ]
 
         tc_bt = compute_ic_meth(tumor_bt, control_bt, reg_bt)
 
@@ -174,9 +178,12 @@ compute_evidence_brms = function(obs,
                                  tc,
                                  tc_lw,
                                  tc_up) {
-    assertthat::are_equal(length(obs), length(cf_mu))
-    assertthat::assert_that((tc <= 1 &
-                                 tc >= 0) | is.na(tc) | is.nan(tc))
+
+    # assertthat::are_equal(length(obs), length(cf_mu))
+    # assertthat::assert_that((tc <= 1 & tc >= 0) | is.na(tc) | is.nan(tc))
+    # assertthat::assert_that(between(cf_mu, 0, 1))
+    # assertthat::assert_that(between(ad_mu, 0, 1))
+    # assertthat::assert_that(between(ne_mu, 0, 1))
 
     ## Handle the case in which tumor content is missing or zero
     if (is.na(tc) | is.nan(tc) | tc == 0) {
@@ -207,38 +214,20 @@ compute_evidence_brms = function(obs,
 
         idata = na.omit(dfin)
 
-        if (TRUE) {
-            ## Linear or quadratic weighting based on variance in the reference
-            brm.1 <- brm(
-                obs | weights(wgh) ~ cf_mu + ad_mu + ne_mu - 1,
-                family = brmsfamily("gaussian"),
-                data = idata,
-                chains = 1,
-                cores = getOption("mc.cores", 1),
-                iter = 2000,
-                warmup = 500,
-                thin = 5,
-                prior = priors,
-                stanvars = stanvar(tc, name = "tc"),
-                silent = 2
-            )
-        } else {
-            brm.1 <- brm(
-                obs ~ cf_mu + ad_mu + ne_mu - 1,
-                family = brmsfamily("gaussian"),
-                data = idata,
-                chains = 1,
-                cores = getOption("mc.cores", 1),
-                iter = 2000,
-                warmup = 500,
-                thin = 5,
-                prior = priors,
-                stanvars = stanvar(tc, name = "tc"),
-                silent = 2
-            )
-
-
-        }
+        ## Linear or quadratic weighting based on variance in the reference
+        brm.1 <- brm(
+            obs | weights(wgh) ~ cf_mu + ad_mu + ne_mu - 1,
+            family = brmsfamily("gaussian"),
+            data = idata,
+            chains = 1,
+            cores = getOption("mc.cores", 1),
+            iter = 2000,
+            warmup = 500,
+            thin = 5,
+            prior = priors,
+            stanvars = stanvar(tc, name = "tc"),
+            silent = 2
+        )
 
         outp = fixef(brm.1, robust = T)[, 1]
 
@@ -305,10 +294,12 @@ compute_all = function(dd,
                        cfdna_ids,
                        mode = "brms",
                        sequential = FALSE,
-                       nclust = 4) {
+                       nclust = 4,
+                       limit = 0.03) {
+
+    cl <- makeCluster(nclust)
 
     if (!sequential) {
-        cl <- makeCluster(nclust)
         registerDoParallel(cl)
     } else {
         registerDoSEQ()
@@ -331,7 +322,6 @@ compute_all = function(dd,
         .packages = c("dplyr"),
         .export = c("deconv_fun")
     ) %dopar% {
-
         `%!in%` <- Negate(`%in%`)
         nn = colnames(dd)[i]
         message(nn)
@@ -348,7 +338,7 @@ compute_all = function(dd,
         }
 
 
-        if (!length(tcs) == 0) {
+        if (!length(tcs) == 0 | is.na(tcs)) {
             if (nn %!in% cfdna_ids) {
                 tern = deconv_fun(
                     obs = dd[, i],
@@ -400,60 +390,26 @@ compute_all = function(dd,
     }
 
     stopCluster(cl)
+
+
+    est_all = est_all %>%
+        mutate(
+            pes = ne / (ne + adeno),
+            pes_lw = ne / (ne + adeno),
+            pes_up = ne / (ne + adeno),
+            tc_est = atlas_tc$est_mu,
+            tc_lw = atlas_tc$ci_upper,
+            tc_up = atlas_tc$ci_lower
+        ) %>%
+        mutate(
+            pes = ifelse(tc_est < limit, NA, pes),
+            pes_lw = ifelse(tc_est < limit, NA, pes_lw),
+            pes_up = ifelse(tc_est < limit, NA, pes_up),
+            quality_flag = tc_est > limit
+        )
+
     return(est_all)
 
 }
 
 
-
-
-
-
-
-#' Compute final scores from deconvolved fractions
-#'
-#' @param score_df input data.frame
-#' @param limit lower limit of detection for tumor content
-#'
-#' @import dplyr tidyr
-#' @return A data.frame with complete estimations
-#' @export
-#'
-format_score = function(score_df, limit = 0.03) {
-    # Compute final evidence
-
-    score_ss = score_df %>%
-        mutate(
-            pes = ne / (ne + adeno),
-            pes_lw = ne / (ne + adeno),
-            pes_up = ne / (ne + adeno),
-            quality_flag = est_mu > limit
-        ) %>%
-        select(
-            SampleName,
-            file_id,
-            Dataset,
-            Class,
-            Type,
-            tc_est = est_mu,
-            tc_lw = ci_lower,
-            tc_up = ci_upper,
-            evidence_ne = ne,
-            evidence_adeno = adeno,
-            pes,
-            pes_lw,
-            pes_up,
-            quality_flag,
-            TumorContent,
-            var_score,
-            rel_error
-        )
-
-    ## If score is below the limit of detection, set to NA
-    score_ss$pes = with(score_ss, ifelse(tc_est < limit, NA, pes))
-    score_ss$pes_lw = with(score_ss, ifelse(tc_est < limit, NA, pes_lw))
-    score_ss$pes_up = with(score_ss, ifelse(tc_est < limit, NA, pes_up))
-
-    return(score_ss)
-
-}

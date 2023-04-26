@@ -11,3 +11,8 @@ test_that("beta sin works", {
     x = .5
     expect_true(x == invSi(siTr(x)))
 })
+
+test_that("test beta mval", {
+    x = .5
+    expect_true(x == .to_beta(.to_mval(x)))
+})

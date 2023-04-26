@@ -7,7 +7,7 @@
 siTr(beta)
 }
 \arguments{
-\item{beta}{}
+\item{beta}{numeric vector of values to transform}
 }
 \value{
 transformed vector

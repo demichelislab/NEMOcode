@@ -18,7 +18,7 @@ compute_ci_confidence(
 
 \item{control_mat}{Matrix of PBMC profiles, regions on rows, samples on columns}
 
-\item{reg_df}{Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively}
+\item{reg_df}{Dataframe of informative regions with 2 columns reg_id and meth_state (-1/+1) for hypo and hyper respectively}
 
 \item{nsub}{number of subsampling iterations to estimate stability (default = 100)}
 

@@ -12,7 +12,8 @@ compute_all(
   cfdna_ids,
   mode = "brms",
   sequential = FALSE,
-  nclust = 4
+  nclust = 4,
+  limit = 0.03
 )
 }
 \arguments{

@@ -5,6 +5,7 @@
 #' @param upper lower bound
 #'
 #' @return a clamped numeric vector
+#' @export
 .clamp_val = function(vec, lower, upper){
     cla = vec
     cla[which(cla < lower)] = lower
@@ -19,6 +20,7 @@
 #' @param mval mval vector
 #'
 #' @return converted values in Beta scale
+#' @export
 .to_beta <- function(mval) {
     bb <- 2^mval / (2^mval + 1)
     return(bb)
@@ -30,6 +32,7 @@
 #' @param beta beta vector
 #'
 #' @return converted values in Mval scale
+#' @export
 .to_mval <- function(beta) {
     ## Extreme values should be converted to avoid errors
     beta[which(beta < 0.01)] <- 0.01
@@ -44,6 +47,7 @@
 #' @param x numeric vector
 #'
 #' @return a normalized numeric vector
+#' @export
 norm_one <- function(x){
     x/sum(x)
 }
@@ -51,7 +55,7 @@ norm_one <- function(x){
 
 #' Beta sine transform
 #'
-#' @param beta
+#' @param beta numeric vector of values to transform
 #'
 #' @return transformed vector
 #' @export
@@ -62,7 +66,7 @@ siTr = function(beta){
 
 #' Inverse Beta-sine transform
 #'
-#' @param x
+#' @param x numeric vetor of values to transform
 #'
 #' @return transformed vector
 #' @export

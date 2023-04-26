@@ -7,7 +7,7 @@
 invSi(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{numeric vetor of values to transform}
 }
 \value{
 transformed vector
