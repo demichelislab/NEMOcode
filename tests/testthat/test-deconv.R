@@ -33,9 +33,9 @@ test_that("compute_ci_confidence works", {
 
 test_that("compute_brms_works", {
 
-    ref = NEMOcode::refDist
+    ref = NEMOcode::refDist[1:100,]
 
-    dd = cbind(ne = ref$ne_mu, cf_mu = ref$cf_mu)
+    dd = cbind(ne = ref$ne_mu[1:100], cf_mu = ref$cf_mu[1:100])
 
     atlas_tc = data.frame(
         SampleName = colnames(dd),
@@ -46,7 +46,7 @@ test_that("compute_brms_works", {
 
     atlas_samples = c()
     cfdna_ids = c("cf_mu")
-    res = suppressWarnings(compute_all(dd, atlas_tc, ref, atlas_samples, cfdna_ids,sequential = TRUE))
+    res = suppressWarnings(compute_all(dd, atlas_tc, ref, atlas_samples, cfdna_ids, sequential = TRUE))
     expect_true(typeof(res) == "list")
 
 })
