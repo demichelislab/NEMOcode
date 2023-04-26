@@ -295,6 +295,11 @@ compute_all = function(dd,
 
 
     assertthat::are_equal(ncol(dd), nrow(atlas_tc))
+    assertthat::assert_that(all(colnames(dd) %in% atlas_tc$SampleName))
+
+    assertthat::assert_that(all(
+        c("SampleName", "est_mu", "ci_lower", "ci_upper") %in% colnames(atlas_tc)
+    ))
 
     cl <- makeCluster(nclust)
 

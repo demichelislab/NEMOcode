@@ -27,6 +27,7 @@ Imports:
     rtracklayer,
     S4Vectors,
     tidyr,
-    foreach
+    foreach,
+    RcppEigen
 Depends: 
     R (>= 2.10)
