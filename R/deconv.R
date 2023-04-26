@@ -292,6 +292,10 @@ compute_all = function(dd,
                        sequential = FALSE,
                        nclust = 4,
                        limit = 0.03) {
+
+
+    assertthat::are_equal(ncol(dd), nrow(atlas_tc))
+
     cl <- makeCluster(nclust)
 
     if (!sequential) {
@@ -380,16 +384,15 @@ compute_all = function(dd,
 
     stopCluster(cl)
 
+    atlc = atlas_tc %>% select(SampleName, tc_est = est_mu, tc_lw = ci_lower, tc_up = ci_upper)
 
     est_all = est_all %>%
         mutate(
             pes = ne / (ne + adeno),
             pes_lw = ne / (ne + adeno),
-            pes_up = ne / (ne + adeno),
-            tc_est = atlas_tc$est_mu,
-            tc_lw = atlas_tc$ci_lower,
-            tc_up = atlas_tc$ci_upper
+            pes_up = ne / (ne + adeno)
         ) %>%
+        inner_join(atlc, by = c("SampleName")) %>%
         mutate(
             pes = ifelse(tc_est < limit, NA, pes),
             pes_lw = ifelse(tc_est < limit, NA, pes_lw),
