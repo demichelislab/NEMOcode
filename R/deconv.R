@@ -175,11 +175,9 @@ compute_evidence_brms = function(obs,
                                  tc,
                                  tc_lw,
                                  tc_up) {
-    # assertthat::are_equal(length(obs), length(cf_mu))
-    # assertthat::assert_that((tc <= 1 & tc >= 0) | is.na(tc) | is.nan(tc))
-    # assertthat::assert_that(between(cf_mu, 0, 1))
-    # assertthat::assert_that(between(ad_mu, 0, 1))
-    # assertthat::assert_that(between(ne_mu, 0, 1))
+
+    assertthat::are_equal(length(obs), length(cf_mu))
+    assertthat::assert_that((tc <= 1 & tc >= 0) | is.na(tc) | is.nan(tc))
 
     ## Handle the case in which tumor content is missing or zero
     if (is.na(tc) | is.nan(tc) | tc == 0) {
@@ -222,7 +220,8 @@ compute_evidence_brms = function(obs,
             thin = 5,
             prior = priors,
             stanvars = stanvar(tc, name = "tc"),
-            silent = 2
+            silent = 2,
+            seed = 123
         )
 
         outp = fixef(brm.1, robust = T)[, 1]
