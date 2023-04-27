@@ -151,3 +151,47 @@ collect_beta_panel = function(cov_file,
     return(res)
 
 }
+
+
+
+#' Collapse statistics of regions
+#'
+#' @param res_collected
+#'
+#' @import dplyr tidyr
+#' @return A data.frame of collapsed regions
+#' @export
+collapse_stats = function(res_collected, ssid) {
+
+    assertthat::are_equal(
+        colnames(res_collected),
+        c(
+            "seqnames",
+            "start",
+            "end",
+            "width",
+            "strand",
+            "beta",
+            "meth",
+            "unmeth",
+            "cov",
+            "reg_id",
+            "region_set"
+        )
+    )
+
+    stats_collected = res_collected %>%
+        mutate(beta = meth / cov) %>%
+        group_by(region_set, reg_id) %>%
+        summarise(
+            mean_meth = mean(beta, na.rm = T),
+            sd_meth = sd(beta, na.rm = T),
+            n_cpgs = n(),
+            tot_cov = sum(cov),
+            tot_meth = sum(meth)
+        ) %>%
+        mutate(sampleID = ssid)
+
+    return(stats_collected)
+
+}
