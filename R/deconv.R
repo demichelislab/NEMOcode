@@ -221,7 +221,8 @@ compute_evidence_brms = function(obs,
             prior = priors,
             stanvars = stanvar(tc, name = "tc"),
             silent = 2,
-            seed = 123
+            seed = 123,
+            refresh = 0
         )
 
         outp = fixef(brm.1, robust = T)[, 1]

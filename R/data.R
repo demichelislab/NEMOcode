@@ -20,3 +20,15 @@
 #'
 #' Reference distributions for cell types of interest: ad:Adeno, ne:NE, adm:PBMC, cf:cfDNA
 "refDist"
+
+
+#' control_mat_cfDNA matrix of cfDNA samples
+#'
+#' Reference samples for tumor content estimation (from Fox-Fisher et al. eLife2021)
+"control_mat"
+
+
+#' control_mat_PBMC matrix of PBMC samples
+#'
+#' Reference samples for tumor content estimation in tissue (from the BLUEPRINT consortium)
+"control_mat_pbmc"
