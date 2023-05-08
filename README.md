@@ -8,11 +8,12 @@
 [![codecov](https://codecov.io/gh/GMFranceschini/NEMOcode/branch/master/graph/badge.svg?token=M6G0L06263)](https://codecov.io/gh/GMFranceschini/NEMOcode)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
-[![doi](https://img.shields.io/badge/doi-000000-green.svg)](https://)
+[![doi](https://img.shields.io/badge/doi-000000-green.svg)](http://dx.doi.org/10.5281/zenodo.7887998)
 
 <!-- badges: end -->
 
-![NEMO](./img/schematic.png)
+![NEMO](./img/schematic.png) *Schematic of NEMO panel design,
+validation, and application*
 
 ## Description
 
@@ -43,9 +44,11 @@ its scope.
 Preprocessed data, including DNA methylation, counts for samples
 profiled with NEMO, and per-region DNA methylation values for all
 samples analyzed, are available in Zenodo
-[link](https://zenodo.org/deposit/7887998). Raw WGBS data are available
-from dbgap (WGBS, phs001752.v2-ctDNA_NE_CRPC_v2). Raw sequencing data
-for samples profiled with NEMO are available upon request.
+[link](http://dx.doi.org/10.5281/zenodo.7887998). Raw WGBS data are
+available from dbgap (WGBS, phs001752.v2-ctDNA_NE_CRPC_v2). Raw
+sequencing data for samples profiled with NEMO are available upon
+request due to privacy concerns. All results from the paper can be
+produced using only DNA methylation counts data.
 
 A minimal guide to obtain NEMO estimation from raw data (DNA methylation
 counts from Bismark) is outlined below.
@@ -68,7 +71,8 @@ though this constraint can be relaxed. The output of this step can be
 formatted into a matrix that recapitulates the average DNA methylation
 level for each sample and each informative region.
 
-![NEMO](./img/est_schematic.png)
+![NEMO](./img/est_schematic.png) *Tumor content and Phenotype Evidence
+score inference strategies*
 
 ### Inference of Tumor Content
 
@@ -262,10 +266,10 @@ res
 #> # A tibble: 4 × 9
 #>   SampleName est_mu  est_sd est_min est_max q025_tc q975_tc ci_lower ci_upper
 #>   <chr>       <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1 HD1        0.0225 0.00710  0.0140  0.0335  0.0152  0.0314   0.0152   0.0314
-#> 2 NCI-H660   1      0        1       1       1       1        1        1     
-#> 3 PM155_P    1      0        1       1       1       1        1        1     
-#> 4 VCaP       1      0        1       1       1       1        1        1
+#> 1 HD1        0.0155 0.00698 0.00754  0.0233 0.00779  0.0226  0.00779   0.0226
+#> 2 NCI-H660   1      0       1        1      1        1       1         1     
+#> 3 PM155_P    1      0       1        1      1        1       1         1     
+#> 4 VCaP       1      0       1        1      1        1       1         1
 ```
 
 As expected, the cfDNA sample from an healthy donor is estimated to have
@@ -315,16 +319,16 @@ result = compute_all(
 )
 
 result
-#>        immune       adeno         ne  rel_error var_score SampleName       pes
-#> 1 0.968159944 0.008863083 0.02297697 0.07735713 0.0358556        HD1        NA
-#> 2 0.001098432 0.236130253 0.76277131 0.36474843 0.1674594   NCI-H660 0.7636101
-#> 3 0.001911564 0.487815726 0.51027271 0.36210107 0.1236771    PM155_P 0.5112500
-#> 4 0.000000000 0.885031668 0.11496833 0.25340946 0.1033591       VCaP 0.1149683
-#>      pes_lw    pes_up     tc_est      tc_lw      tc_up quality_flag
-#> 1        NA        NA 0.02251116 0.01515084 0.03137269        FALSE
-#> 2 0.7636101 0.7636101 1.00000000 1.00000000 1.00000000         TRUE
-#> 3 0.5112500 0.5112500 1.00000000 1.00000000 1.00000000         TRUE
-#> 4 0.1149683 0.1149683 1.00000000 1.00000000 1.00000000         TRUE
+#>        immune       adeno         ne rel_error  var_score SampleName       pes
+#> 1 0.976461717 0.004225665 0.01931262 0.0769861 0.04087641        HD1        NA
+#> 2 0.001098432 0.236130253 0.76277131 0.3647484 0.16745938   NCI-H660 0.7636101
+#> 3 0.001911564 0.487815726 0.51027271 0.3621011 0.12367707    PM155_P 0.5112500
+#> 4 0.000000000 0.885031668 0.11496833 0.2534095 0.10335912       VCaP 0.1149683
+#>      pes_lw    pes_up    tc_est       tc_lw      tc_up quality_flag
+#> 1        NA        NA 0.0155196 0.007794459 0.02264177        FALSE
+#> 2 0.7636101 0.7636101 1.0000000 1.000000000 1.00000000         TRUE
+#> 3 0.5112500 0.5112500 1.0000000 1.000000000 1.00000000         TRUE
+#> 4 0.1149683 0.1149683 1.0000000 1.000000000 1.00000000         TRUE
 ```
 
 The results report the relative contributions of the three expected
@@ -350,6 +354,6 @@ has the minimum tumor content to perform an estimation (3%) or not.
 
 To reproduce the score reported in the paper simply run the scoring
 functions on the corresponding data deposited in Zenodo
-[Zenodo](https://github.com/). Computed scores for analyzed samples are
-also available as Supplementary Data in our
+[Zenodo](http://dx.doi.org/10.5281/zenodo.7887998). Computed scores for
+analyzed samples are also available as Supplementary Data in our
 [study](https://github.com/).
