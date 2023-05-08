@@ -23,9 +23,7 @@ knitr::opts_chunk$set(
 [![codecov](https://codecov.io/gh/GMFranceschini/NEMOcode/branch/master/graph/badge.svg?token=M6G0L06263)](https://codecov.io/gh/GMFranceschini/NEMOcode)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
-[![doi](https://img.shields.io/badge/doi-000000-green.svg)](http://dx.doi.org/10.5281/zenodo.7887998)
-
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7887998.svg)](https://doi.org/10.5281/zenodo.7887998)
 <!-- badges: end -->
 
 ![NEMO](./img/schematic.png)
@@ -236,7 +234,7 @@ head(test_mat)
 ### Tumor content estimation
 
 The next step is tumor content estimation. In this case, only the tumor
-informative regions are used (`mCRPC_PBMC"`, as they have CRPC specific
+informative regions are used (`mCRPC_PBMC`, as they have CRPC specific
 signal against the white blood cell background).
 
 ```{r, message=FALSE}
@@ -330,7 +328,6 @@ The quality flag variable simply reports weather the sample has the minimum tumo
 content to perform an estimation (3%) or not.
 
 To reproduce the score reported in the paper simply run the scoring
-functions on the corresponding data deposited in Zenodo
-[Zenodo](http://dx.doi.org/10.5281/zenodo.7887998). Computed scores for analyzed samples are
-also available as Supplementary Data in our
-[study](https://github.com/).
+functions on the corresponding data deposited in
+[Zenodo](https://doi.org/10.5281/zenodo.7887998). Computed scores for analyzed samples are
+also available as Supplementary Data in our study (Franceschini et al., ...).
