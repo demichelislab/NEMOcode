@@ -9,40 +9,43 @@
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
 [![doi](https://img.shields.io/badge/doi-000000-green.svg)](https://)
+
 <!-- badges: end -->
 
 ![NEMO](./img/schematic.png)
 
 ## Description
 
-### NEMO tumor content and PE score estimation
-
-This repository contains the required code to compute circulating Tumor
+This repository contains the required code to perform circulating Tumor
 Content estimation (TC) and Phenotype Evidence score (PE score)
-estimation from DNA methylation data generated or masked using the
-NEMO-panel design. The NEMO-panel is a tailored sequencing assay to
-monitor CRPC through cell-free DNA (cfDNA) methylation and ultimately
-provide detection of treatment-induced neuroendocrine prostate cancer.
-Starting from DNA methylation counts obtained from BS-seq techniques,
-the following steps estimate those clinically relevant quantities. For
-more details, please see the original manuscript [link](link).
+estimation from DNA methylation data generated (or masked) using the
+NEMO assay. The NEMO assay is a tailored sequencing panel to monitor
+CRPC through cell-free DNA (cfDNA) methylation and ultimately provide
+detection of treatment-induced neuroendocrine prostate cancer. The
+following steps estimate those clinically relevant quantities starting
+from DNA methylation counts obtained from BS-seq techniques. For more
+details, please see the original manuscript ([link](link)).
 
 Notice that, in principle, masked whole genome bisulfite sequencing data
 can be used to generate per-region Beta values. Even though the signal
 quality will likely be lower due to limited coverage, we successfully
-applied our method to a collection of WGBS and eRRBS datasets.
+applied our method to a collection of WGBS and eRRBS datasets obtaining
+coherent results.
 
-Importantly, the presented scripts are tailored for the NEMO panel
-design and where not developed to be more general deconvolution or tumor
+Notably, the presented scripts are tailored for the NEMO panel design
+and were not developed to be more general deconvolution or tumor
 estimation strategies. While the same principles can be applied to other
-tumor types, there is no guarantee that our approach will work beyond
+tumor types or settings, our approach is not guaranteed to work beyond
 its scope.
 
 ### Data availability
 
-Preprocessed data are available in Zenodo [link](link). Raw data are
-available from GEO (NEMO panel) and SRA (WGBS,
-phs001752.v2-ctDNA_NE_CRPC_v2).
+Preprocessed data, including DNA methylation, counts for samples
+profiled with NEMO, and per-region DNA methylation values for all
+samples analyzed, are available in Zenodo
+[link](https://zenodo.org/deposit/7887998). Raw WGBS data are available
+from dbgap (WGBS, phs001752.v2-ctDNA_NE_CRPC_v2). Raw sequencing data
+for samples profiled with NEMO are available upon request.
 
 A minimal guide to obtain NEMO estimation from raw data (DNA methylation
 counts from Bismark) is outlined below.
@@ -50,19 +53,22 @@ counts from Bismark) is outlined below.
 ### Data preparation
 
 Raw data has been processed using a standard pipeline for DNA
-methylation (`nf-core/methylseq`, version 1.6 [link](link)). DNA
-methylation counts in bismark format and hg19 coordinates are required
-as a starting input. Examples of such input files can be found in
+methylation (nf-core/methylseq, version 1.6 (
+[link](https://nf-co.re/methylseq/1.6/docs/usage) ). DNA methylation
+counts in bismark format, and hg19 coordinates are required as a
+starting input. Examples of such input files can be found in
 `inst/extdata/`. Other types of inputs can be adapted, provided that per
 CpG DNA methylation counts are available. The first functions
-`collect_beta_panel` and `collapse_stats` use the input counts to
+`collect_beta_panel()` and `collapse_stats()` use the input counts to
 estimate a region-wise DNA methylation value (Beta). For each sample and
 each region in the NEMO design, the average Beta value is computed as
 the fraction of methylated CpGs over the total (first per CpG, then per
-region). In our analyses, we retain only CpGs with at least 10x
-coverage, even though this constraint can be relaxed. The output of this
-step can be formatted into a matrix that recapitulates the average DNA
-methylation level for each sample and each informative region.
+region). Our analyses retain only CpGs with at least 10x coverage, even
+though this constraint can be relaxed. The output of this step can be
+formatted into a matrix that recapitulates the average DNA methylation
+level for each sample and each informative region.
+
+![NEMO](./img/est_schematic.png)
 
 ### Inference of Tumor Content
 
@@ -94,13 +100,14 @@ has been generated and is available in the `resource` folder. The
 reconstruction task is performed through a Bayesian linear regression
 `compute_all()`/`compute_evidence_brms()`, which computes the most
 likely fractions of each cell type. A strong prior is used for the
-healthy cfDNA signal, as it is equal to $(1 - TC)$, while a
-non-informative prior is used for the NE and Adeno components. The
-relative error of the estimation is computed as the maximum standerd
-error across NE and Adeno fractions, divided by the total tumor content.
-The PE score is not reliable when the tumor content is below 3%, while
-we recommend caution in interpreting the PE score between 3% and 10% of
-TC.
+healthy cfDNA signal, as it is equal to one minus the tumor content,
+while a non-informative prior is used for the NE and Adeno components.
+The relative error of the estimation is computed as the maximum standard
+error across NE and Adeno fractions, divided by the total tumor content
+(currently, this statististic is not used). Notice that the PE score is
+not reliable when the tumor content is below 3%, while we recommend
+caution in interpreting the PE score between 3% and 10% of tumor
+content.
 
 ### Installation
 
@@ -109,47 +116,48 @@ You can install the current version of NEMOcode from
 
 ``` r
 # install.packages("devtools")
+install.packages("brms")
 devtools::install_github("GMFranceschini/NEMOcode")
 ```
 
 ### Requirements
 
-These scripts have been tested with R version `4.1.2` and Ubuntu 22.04.
-A series of packages will be installed to make `NEMOcode` work. Those
-dependencies are listed in the `DESCRIPTION` file. The `brms` package
-might require additional care for the installation, see this
+These package has been tested with R version `4.1.2` and Ubuntu 22.04. A
+series of additioal packages will be installed to make `NEMOcode` work.
+Those dependencies are listed in the `DESCRIPTION` file. The `brms`
+package might require additional care for the installation, see this
 [link](https://learnb4ss.github.io/learnB4SS/articles/install-brms.html)
-for help. Installation of the package should take few minutes.
+for help.  
+Installation of the package should take few minutes.
+
+## Example
 
 ``` r
-library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.2     ✔ readr     2.1.4
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.0
-#> ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-#> ✔ purrr     1.0.1     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+library(dplyr)
+library(tidyr)
 library(NEMOcode)
-## basic example code
 ```
+
+### Preparation
 
 First, we load a small set of data included in the package. Those
 samples have been profiled with the NEMO assay, and this data is in a
-standard form of raw counts.
+standard form of raw counts. The three examples include a CRPC organoid
+with stem-cell like features (`PM155_P`), a cell-free DNA sample from an
+healthy donor (`HD1`), a neuroendocrine cell line (`NCI-H660`), and the
+VCaP CRPC cell line (`VCaP`).
 
 ``` r
 
 fpath1 <- system.file("extdata", "PM155_P-run_pilotCells_unif.RData", package="NEMOcode")
 fpath2 <- system.file("extdata", "HD1-run_pilot_cfDNA_unif.RData", package="NEMOcode")
 fpath3 <- system.file("extdata", "VCaP-run_pilotCells_unif.RData", package="NEMOcode")
+fpath4 <- system.file("extdata", "NCI-H660-run_pilotCells2_unif.RData", package="NEMOcode")
 
 exfile1 = local(get(load(fpath1)))
 exfile2 = local(get(load(fpath2)))
 exfile3 = local(get(load(fpath3)))
+exfile4 = local(get(load(fpath4)))
 
 head(exfile1)
 #>    chr   start     end      beta meth unmeth
@@ -164,12 +172,12 @@ head(exfile1)
 The first step of the analysis is to reduce the input data to region
 level DNA methylation, using the panel design as reference. For each
 region, the average DNA methylation (Beta) is computed. The high local
-autocorrelation supports the idea of collapsing contiguous CpGs to
-obtain a robust signal.
+autocorrelation of DNA methylation supports the idea of collapsing
+contiguous CpGs to obtain a robust signal.
 
 ``` r
 
-list_counts = list("PM155_P" = exfile1, "HD1" = exfile2, "VCaP" = exfile3)
+list_counts = list("PM155_P" = exfile1, "HD1" = exfile2, "VCaP" = exfile3, "NCI-H660" = exfile4)
 pdes = NEMOcode::panel_design
 coll_regs = list()
 
@@ -195,9 +203,11 @@ head(coll_regs)
 ```
 
 Now we can turn the result into matrix form, using the average Beta
-value per region as entry.
+value per region as entry. This will be the main input for tumor content
+estimation and PE score estimation.
 
 ``` r
+
 test_mat = coll_regs %>% 
     ungroup() %>% 
     select(sampleID, mean_meth, reg_id) %>% 
@@ -214,16 +224,18 @@ to_matrix<-function(x) {
 
 test_mat = to_matrix(test_mat)
 head(test_mat)
-#>                                  HD1   PM155_P      VCaP
-#> chr10:119590052-119590055 0.20967742 0.9687500 0.8888889
-#> chr10:123923781-123924185 0.05196424 0.9762074 0.9724014
-#> chr10:134562610-134562613 0.96000000 0.9117647 0.9677419
-#> chr10:134563052-134563055 0.97402597 1.0000000 0.9090909
-#> chr10:134563060-134563064 0.98089172 0.9714286 1.0000000
-#> chr10:134563098-134563102 0.97500000 0.9736842 0.9459459
+#>                                  HD1   NCI-H660   PM155_P      VCaP
+#> chr10:119590052-119590055 0.20967742 0.93571429 0.9687500 0.8888889
+#> chr10:123923781-123924185 0.05196424 0.04188003 0.9762074 0.9724014
+#> chr10:134562610-134562613 0.96000000 0.96153846 0.9117647 0.9677419
+#> chr10:134563052-134563055 0.97402597 0.96385542 1.0000000 0.9090909
+#> chr10:134563060-134563064 0.98089172 0.96590909 0.9714286 1.0000000
+#> chr10:134563098-134563102 0.97500000 0.96969697 0.9736842 0.9459459
 ```
 
-The next step is tumor content estimation. In this case, only the TC
+### Tumor content estimation
+
+The next step is tumor content estimation. In this case, only the tumor
 informative regions are used (`mCRPC_PBMC"`, as they have CRPC specific
 signal against the white blood cell background).
 
@@ -247,13 +259,21 @@ res = compute_ci_confidence(
     )
 
 res
-#> # A tibble: 3 × 9
+#> # A tibble: 4 × 9
 #>   SampleName est_mu  est_sd est_min est_max q025_tc q975_tc ci_lower ci_upper
 #>   <chr>       <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1 HD1        0.0279 0.00671  0.0200  0.0374  0.0209  0.0365   0.0209   0.0365
-#> 2 PM155_P    1      0        1       1       1       1        1        1     
-#> 3 VCaP       1      0        1       1       1       1        1        1
+#> 1 HD1        0.0225 0.00710  0.0140  0.0335  0.0152  0.0314   0.0152   0.0314
+#> 2 NCI-H660   1      0        1       1       1       1        1        1     
+#> 3 PM155_P    1      0        1       1       1       1        1        1     
+#> 4 VCaP       1      0        1       1       1       1        1        1
 ```
+
+As expected, the cfDNA sample from an healthy donor is estimated to have
+a tumor content (`est_mu`) below 3%, our sensitivity threshold, and thus
+it can be considered negative for tumor. On the other hand, all CRPC
+models produce a tumor content of 1, as expected.
+
+### Phenotype Evidence score estimation
 
 Once the tumor content is known, the final step is to estimate the
 relative contributions of CRPC-NE, CRPC-Adeno, and cfDNA. In this case,
@@ -261,12 +281,21 @@ another set of informative regions is used (a collection of regions
 resulted from differential methylation analysis between CRPC-Adeno and
 CRPC-NE samples). Importantly, the tumor content is known and it is fed
 to the function, informing the expected relative fraction of CRPC signal
-over the total.
+over the total. In the `compute_all()` function it is possible to
+indicate a set of samples for which `cfDNA` is the expected background,
+instead of `PBMC` (default). Furthermore, one can enforce the tumor
+content estimation to be 1 by adding the sample name to `atlas_samples`.
 
 ``` r
 
-ppe = pdes %>% 
-    filter(region_set %in% c("rockermeth_NEvsAdeno", "NE_Adeno", "CpG_site_DNAmeth_classifierJCI_2020"))
+ppe = pdes %>%
+    filter(
+        region_set %in% c(
+            "rockermeth_NEvsAdeno",
+            "NE_Adeno",
+            "CpG_site_DNAmeth_classifierJCI_2020"
+        )
+    )
 
 refDist = NEMOcode::refDist
 rownames(refDist) = refDist$reg_id
@@ -281,28 +310,46 @@ result = compute_all(
     ref_mat = refDist,
     atlas_tc = res,
     atlas_samples = c(),
-    cfdna_ids = c(),
+    cfdna_ids = c("HD1"),
     sequential = T
 )
 
 result
-#>        immune       adeno         ne  rel_error  var_score SampleName       pes
-#> 1 0.973586277 0.001861452 0.02455227 0.08750612 0.04714514        HD1        NA
-#> 2 0.001911564 0.487815726 0.51027271 0.36210107 0.12367707    PM155_P 0.5112500
-#> 3 0.000000000 0.885031668 0.11496833 0.25340946 0.10335912       VCaP 0.1149683
+#>        immune       adeno         ne  rel_error var_score SampleName       pes
+#> 1 0.968159944 0.008863083 0.02297697 0.07735713 0.0358556        HD1        NA
+#> 2 0.001098432 0.236130253 0.76277131 0.36474843 0.1674594   NCI-H660 0.7636101
+#> 3 0.001911564 0.487815726 0.51027271 0.36210107 0.1236771    PM155_P 0.5112500
+#> 4 0.000000000 0.885031668 0.11496833 0.25340946 0.1033591       VCaP 0.1149683
 #>      pes_lw    pes_up     tc_est      tc_lw      tc_up quality_flag
-#> 1        NA        NA 0.02790538 0.02086163 0.03647445        FALSE
-#> 2 0.5112500 0.5112500 1.00000000 1.00000000 1.00000000         TRUE
-#> 3 0.1149683 0.1149683 1.00000000 1.00000000 1.00000000         TRUE
+#> 1        NA        NA 0.02251116 0.01515084 0.03137269        FALSE
+#> 2 0.7636101 0.7636101 1.00000000 1.00000000 1.00000000         TRUE
+#> 3 0.5112500 0.5112500 1.00000000 1.00000000 1.00000000         TRUE
+#> 4 0.1149683 0.1149683 1.00000000 1.00000000 1.00000000         TRUE
 ```
+
+The results report the relative contributions of the three expected
+populations `ne`, `adeno` and `immune`. The `pe` score is computed as
+`ne/(ne+adeno)`, and reflects the degree of neuroendocrine
+differentiation of tumor derived DNA.
 
 Notice that the runtime for each sample can be in the order of few
 minutes, as the bayesian regression employs numerical methods to
 estimate regression parameters. For this reason, the analysis of a large
 dataset might require parallelization over multiple cores on a machine
 with good computational power (parallelization is already implemented in
-`compute_all()` function).
+`compute_all()` function. `sequential=TRUE` sets sequential computation.
+`nclust` can be used to indicate the number of threads to use).
+
+The relative error and variability score are simple metrics to measure
+reconstruction accuracy. Currently, they are not used but were
+considered to set the lower limit of PE score estimation. Their usage
+will possibly be considered in future implementation. The same holds for
+the confidence interval of the PE score, which is currently a
+placeholder. The quality flag variable simply reports weather the sample
+has the minimum tumor content to perform an estimation (3%) or not.
 
 To reproduce the score reported in the paper simply run the scoring
 functions on the corresponding data deposited in Zenodo
-[Zenodo](https://github.com/).
+[Zenodo](https://github.com/). Computed scores for analyzed samples are
+also available as Supplementary Data in our
+[study](https://github.com/).

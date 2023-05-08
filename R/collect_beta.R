@@ -43,7 +43,7 @@ collect_beta_panel = function(cov_file,
             reg_reg = data.frame(ss_gr) %>% select(reg_id, region_set)
 
             ## Enlarge of 1 bp for cases with length = 1,
-            ## as HOMER has a bug that causes start and end to invert
+            ## as HOMER annotation caused start and end to invert
 
             if (ss == "CpG_site_DNAmeth_classifierJCI_2020") {
                 ss_gr$end = ss_gr$end + 1
@@ -103,7 +103,7 @@ collect_beta_panel = function(cov_file,
 
             }
 
-            ## Add regions that are not covered
+            ## Add regions that are not covered as NA values
             add_reg = reg_reg %>%
                 mutate(
                     seqnames = NA,
@@ -156,7 +156,7 @@ collect_beta_panel = function(cov_file,
 
 #' Collapse statistics of regions
 #'
-#' @param res_collected
+#' @param res_collected the result of collect_beta_panel function
 #'
 #' @import dplyr tidyr
 #' @return A data.frame of collapsed regions

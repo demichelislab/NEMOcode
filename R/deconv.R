@@ -1,13 +1,11 @@
 #' Compute the fraction of non-WBC derived cell-free DNA in a sample
 #'
-#' @param tumor_mat Matrix of tumor samples in which estimate IC fraction, regions on rows, samples on columns
-#' @param control_mat Matrix of PBMC profiles, regions on rows, samples on columns
-#' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively
-#'
+#' @param tumor_mat Matrix of samples in which estimate epithelial (tumoral) fraction, regions on rows, samples on columns.
+#' @param control_mat Matrix of PBMC or cfDNA DNA methylation profiles, regions on rows, samples on columns.
+#' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively, reporting the differential between CRPC samples and PBMC/cfDNA
 #' @import tidyr dplyr
 #' @return A vector with TC estimation for input samples
 #' @export
-#'
 compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
     rownames(reg_df) <- reg_df$reg_id
 
@@ -62,9 +60,9 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
 
 #' Compute the fraction of unexpected epithelial cell-free DNA in a sample with subsampling confidence interval
 #'
-#' @param tumor_mat Matrix of tumor samples in which estimate IC fraction, regions on rows, samples on columns
-#' @param control_mat Matrix of PBMC profiles, regions on rows, samples on columns
-#' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth_state (-1/+1) for hypo and hyper respectively
+#' @param tumor_mat Matrix of plasma samples in which estimate the epithelial (tumoral) fraction, regions on rows, samples on columns
+#' @param control_mat Matrix of PBMC/cfDNA profiles, regions on rows, samples on columns
+#' @param reg_df Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively, reporting the differential between CRPC samples and PBMC/cfDNA
 #' @param nsub number of subsampling iterations to estimate stability (default = 100)
 #' @param quant_prob the quantile of probabilities to produce stability interval via subsampling (0.05 = 95\% CI)
 #' @param frac_sub the fraction of informative regions to use for subsampling iterations
@@ -181,6 +179,7 @@ compute_evidence_brms = function(obs,
 
     ## Handle the case in which tumor content is missing or zero
     if (is.na(tc) | is.nan(tc) | tc == 0) {
+
         res = data.frame(
             immune = 1 - tc,
             adeno = NA,
@@ -278,7 +277,8 @@ compute_evidence_brms = function(obs,
 #' @param cfdna_ids List of samples for which healthy cfDNA should be used as background, instead of PBMCs (default)
 #' @param mode Deconvolution strategy used, default to brms Bayesian regression (Stan backend)
 #' @param sequential execute the computation sequentially (for debugging purpose)
-#' @param nclust Number of cluster for parallel computation
+#' @param nclust Number of cluster for parallel computation (default:4)
+#' @param limit The lower limit of PE score estimation (Default:3%)
 #'
 #' @import parallel doParallel foreach
 #' @return A data.frame with PE score
