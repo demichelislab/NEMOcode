@@ -33,7 +33,7 @@ validation, and application*
 **Important note**: this is the internal and fully functional version of the repository.
 It includes the panel design, which is currently undisclosed. 
 
-### Do not share this repository outside the group without approval.
+### Please do not share this repository outside the group without approval.
 
 ## Description
 

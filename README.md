@@ -19,7 +19,7 @@ validation, and application*
 the repository. It includes the panel design, which is currently
 undisclosed.
 
-### Do not share this repository outside the group without approval.
+### Please do not share this repository outside the group without approval.
 
 ## Description
 
@@ -272,10 +272,10 @@ res
 #> # A tibble: 4 × 9
 #>   SampleName est_mu  est_sd est_min est_max q025_tc q975_tc ci_lower ci_upper
 #>   <chr>       <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1 HD1        0.0187 0.00566  0.0113  0.0239  0.0118  0.0236   0.0118   0.0236
-#> 2 NCI-H660   1      0        1       1       1       1        1        1     
-#> 3 PM155_P    1      0        1       1       1       1        1        1     
-#> 4 VCaP       1      0        1       1       1       1        1        1
+#> 1 HD1        0.0198 0.00648 0.00884  0.0298  0.0108  0.0278   0.0108   0.0278
+#> 2 NCI-H660   1      0       1        1       1       1        1        1     
+#> 3 PM155_P    1      0       1        1       1       1        1        1     
+#> 4 VCaP       1      0       1        1       1       1        1        1
 ```
 
 As expected, the cfDNA sample from an healthy donor is estimated to have
@@ -326,12 +326,12 @@ result = compute_all(
 
 result
 #>        immune       adeno         ne  rel_error  var_score SampleName       pes
-#> 1 0.972266758 0.004875511 0.02285773 0.07722591 0.03910168        HD1        NA
+#> 1 0.974393824 0.006878667 0.01872751 0.07702564 0.03895759        HD1        NA
 #> 2 0.001098432 0.236130253 0.76277131 0.36474843 0.16745938   NCI-H660 0.7636101
 #> 3 0.001911564 0.487815726 0.51027271 0.36210107 0.12367707    PM155_P 0.5112500
 #> 4 0.000000000 0.885031668 0.11496833 0.25340946 0.10335912       VCaP 0.1149683
 #>      pes_lw    pes_up     tc_est      tc_lw      tc_up quality_flag
-#> 1        NA        NA 0.01865905 0.01179734 0.02360393        FALSE
+#> 1        NA        NA 0.01976486 0.01080468 0.02781556        FALSE
 #> 2 0.7636101 0.7636101 1.00000000 1.00000000 1.00000000         TRUE
 #> 3 0.5112500 0.5112500 1.00000000 1.00000000 1.00000000         TRUE
 #> 4 0.1149683 0.1149683 1.00000000 1.00000000 1.00000000         TRUE
