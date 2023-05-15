@@ -9,13 +9,16 @@
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7887998.svg)](https://doi.org/10.5281/zenodo.7887998)
+
 <!-- badges: end -->
 
 ![NEMO](./img/schematic.png) *Schematic of NEMO panel design,
 validation, and application*
 
-*Important note: we currently cannot disclose the panel design including
-detailed informations about out regions and their usage for inference*
+**Important note**: this is the internal and fully functional version of
+the repository. It includes the panel design, which is currently
+undisclosed. Do not share this repository outside the group without
+approval.
 
 ## Description
 
@@ -268,7 +271,7 @@ res
 #> # A tibble: 4 × 9
 #>   SampleName est_mu  est_sd est_min est_max q025_tc q975_tc ci_lower ci_upper
 #>   <chr>       <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1 HD1        0.0246 0.00904  0.0122  0.0427  0.0138  0.0391   0.0138   0.0391
+#> 1 HD1        0.0209 0.00768  0.0120  0.0336  0.0125  0.0311   0.0125   0.0311
 #> 2 NCI-H660   1      0        1       1       1       1        1        1     
 #> 3 PM155_P    1      0        1       1       1       1        1        1     
 #> 4 VCaP       1      0        1       1       1       1        1        1
@@ -321,13 +324,13 @@ result = compute_all(
 )
 
 result
-#>        immune      adeno         ne  rel_error  var_score SampleName       pes
-#> 1 0.968277930 0.01067082 0.02105125 0.07728026 0.03878682        HD1        NA
-#> 2 0.001098432 0.23613025 0.76277131 0.36474843 0.16745938   NCI-H660 0.7636101
-#> 3 0.001911564 0.48781573 0.51027271 0.36210107 0.12367707    PM155_P 0.5112500
-#> 4 0.000000000 0.88503167 0.11496833 0.25340946 0.10335912       VCaP 0.1149683
+#>        immune       adeno         ne  rel_error  var_score SampleName       pes
+#> 1 0.971555774 0.007190553 0.02125367 0.07718381 0.03962718        HD1        NA
+#> 2 0.001098432 0.236130253 0.76277131 0.36474843 0.16745938   NCI-H660 0.7636101
+#> 3 0.001911564 0.487815726 0.51027271 0.36210107 0.12367707    PM155_P 0.5112500
+#> 4 0.000000000 0.885031668 0.11496833 0.25340946 0.10335912       VCaP 0.1149683
 #>      pes_lw    pes_up     tc_est      tc_lw      tc_up quality_flag
-#> 1        NA        NA 0.02456769 0.01382022 0.03905038        FALSE
+#> 1        NA        NA 0.02087948 0.01254934 0.03113464        FALSE
 #> 2 0.7636101 0.7636101 1.00000000 1.00000000 1.00000000         TRUE
 #> 3 0.5112500 0.5112500 1.00000000 1.00000000 1.00000000         TRUE
 #> 4 0.1149683 0.1149683 1.00000000 1.00000000 1.00000000         TRUE
