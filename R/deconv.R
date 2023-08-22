@@ -76,8 +76,20 @@ compute_ci_confidence = function(tumor_mat,
                                  nsub = 100,
                                  quant_prob = .05,
                                  frac_sub = .5) {
+
+    set.seed(123)
+
     assertthat::are_equal(nrow(tumor_mat), nrow(control_mat))
     assertthat::are_equal(nrow(tumor_mat), nrow(reg_df))
+
+
+    ## For the mean TC estimation, use the full matrix (all regions)
+    tc_full = compute_ic_meth(tumor_mat, control_man, reg_df)
+    tc_full = data.frame(
+        SampleName = names(tc_bt$tc_est),
+        meth_est = tc_full$tc_est,
+        bt = "full"
+    )
 
 
     ll_bt = list()
@@ -135,6 +147,8 @@ compute_ci_confidence = function(tumor_mat,
             est_min = .clamp_val(est_min, 0, 1),
             est_max = .clamp_val(est_max, 0, 1)
         )
+
+
 
     return(tc_est_ci)
 

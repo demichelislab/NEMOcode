@@ -154,12 +154,15 @@ package might require additional care for the installation, see this
 for help.\
 Installation of the package should take few minutes.
 
+Notice that MacOS systems might require the additional installation of `Xcode`, `gfortran`, `StanHeaders`, and R dev binaries using `macrtools`.
+
 ## Example
 
 ```{r, message=FALSE}
 library(dplyr)
 library(tidyr)
 library(NEMOcode)
+rstan::rstan_options(javascript=FALSE)
 ```
 
 ### Preparation
