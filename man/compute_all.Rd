@@ -31,7 +31,9 @@ compute_all(
 
 \item{sequential}{execute the computation sequentially (for debugging purpose)}
 
-\item{nclust}{Number of cluster for parallel computation}
+\item{nclust}{Number of cluster for parallel computation (default:4)}
+
+\item{limit}{The lower limit of PE score estimation (Default:3\%)}
 }
 \value{
 A data.frame with PE score

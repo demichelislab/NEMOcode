@@ -302,7 +302,7 @@ compute_evidence_brms = function(obs,
 #' @param mode Deconvolution strategy used, default to brms Bayesian regression (Stan backend)
 #' @param sequential execute the computation sequentially (for debugging purpose)
 #' @param nclust Number of cluster for parallel computation (default:4)
-#' @param limit The lower limit of PE score estimation (Default:3%)
+#' @param limit The lower limit of PE score estimation (Default:3\%)
 #'
 #' @import parallel doParallel foreach
 #' @return A data.frame with PE score

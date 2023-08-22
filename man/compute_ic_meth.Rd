@@ -7,11 +7,11 @@
 compute_ic_meth(tumor_mat, control_mat, reg_df)
 }
 \arguments{
-\item{tumor_mat}{Matrix of tumor samples in which estimate IC fraction, regions on rows, samples on columns}
+\item{tumor_mat}{Matrix of samples in which estimate epithelial (tumoral) fraction, regions on rows, samples on columns.}
 
-\item{control_mat}{Matrix of PBMC profiles, regions on rows, samples on columns}
+\item{control_mat}{Matrix of PBMC or cfDNA DNA methylation profiles, regions on rows, samples on columns.}
 
-\item{reg_df}{Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively}
+\item{reg_df}{Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively, reporting the differential between CRPC samples and PBMC/cfDNA}
 }
 \value{
 A vector with TC estimation for input samples

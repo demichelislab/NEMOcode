@@ -157,6 +157,7 @@ collect_beta_panel = function(cov_file,
 #' Collapse statistics of regions
 #'
 #' @param res_collected the result of collect_beta_panel function
+#' @param ssid vecotr of sample names (ordered as in res_collected)
 #'
 #' @import dplyr tidyr
 #' @return A data.frame of collapsed regions

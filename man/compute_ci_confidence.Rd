@@ -14,11 +14,11 @@ compute_ci_confidence(
 )
 }
 \arguments{
-\item{tumor_mat}{Matrix of tumor samples in which estimate IC fraction, regions on rows, samples on columns}
+\item{tumor_mat}{Matrix of plasma samples in which estimate the epithelial (tumoral) fraction, regions on rows, samples on columns}
 
-\item{control_mat}{Matrix of PBMC profiles, regions on rows, samples on columns}
+\item{control_mat}{Matrix of PBMC/cfDNA profiles, regions on rows, samples on columns}
 
-\item{reg_df}{Dataframe of informative regions with 2 columns reg_id and meth_state (-1/+1) for hypo and hyper respectively}
+\item{reg_df}{Dataframe of informative regions with 2 columns reg_id and meth state (-1/+1) for hypo and hyper respectively, reporting the differential between CRPC samples and PBMC/cfDNA}
 
 \item{nsub}{number of subsampling iterations to estimate stability (default = 100)}
 

@@ -7,7 +7,9 @@
 collapse_stats(res_collected, ssid)
 }
 \arguments{
-\item{res_collected}{}
+\item{res_collected}{the result of collect_beta_panel function}
+
+\item{ssid}{vecotr of sample names (ordered as in res_collected)}
 }
 \value{
 A data.frame of collapsed regions

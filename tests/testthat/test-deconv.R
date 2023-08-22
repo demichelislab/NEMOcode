@@ -46,7 +46,15 @@ test_that("compute_brms_works", {
 
     atlas_samples = c()
     cfdna_ids = c("cf_mu")
-    res = suppressWarnings(compute_all(dd, atlas_tc, ref, atlas_samples, cfdna_ids, sequential = TRUE))
+    res = suppressWarnings(compute_all(
+        dd,
+        atlas_tc,
+        ref,
+        atlas_samples,
+        cfdna_ids,
+        sequential = TRUE,
+        nclust = 1
+    ))
     expect_true(typeof(res) == "list")
 
 })
