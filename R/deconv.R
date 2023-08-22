@@ -19,6 +19,7 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
         reg_df %>% filter(meth_state == +1) %>% pull(reg_id)
     reg_hypo <- reg_df %>% filter(meth_state == -1) %>% pull(reg_id)
 
+
     cancer_mat = tumor_mat
     cancer_mat[reg_hypo, ] = 1 - cancer_mat[reg_hypo, ]
 
@@ -30,14 +31,14 @@ compute_ic_meth <- function(tumor_mat, control_mat, reg_df) {
 
     if (length(reg_hyper) >= 1) {
         offset_hyper <-
-            median(apply(ctrl_mat[reg_hyper,], 1, mean, na.rm = T))
+            median(apply(ctrl_mat[reg_hyper,], 1, mean, na.rm = T), na.rm = T)
     } else {
         offset_hyper = 0
     }
 
     if (length(reg_hypo) >= 1) {
         offset_hypo <-
-            median(apply(ctrl_mat[reg_hypo,], 1, mean, na.rm = T))
+            median(apply(ctrl_mat[reg_hypo,], 1, mean, na.rm = T), na.rm = T)
     } else {
         offset_hypo = 0
     }
@@ -84,9 +85,9 @@ compute_ci_confidence = function(tumor_mat,
 
 
     ## For the mean TC estimation, use the full matrix (all regions)
-    tc_full = compute_ic_meth(tumor_mat, control_man, reg_df)
+    tc_full = compute_ic_meth(tumor_mat, control_mat, reg_df)
     tc_full = data.frame(
-        SampleName = names(tc_bt$tc_est),
+        SampleName = names(tc_full$tc_est),
         meth_est = tc_full$tc_est,
         bt = "full"
     )
@@ -123,7 +124,6 @@ compute_ci_confidence = function(tumor_mat,
     tc_est_ci = df_bt %>%
         group_by(SampleName) %>%
         summarise(
-            est_mu = mean(meth_est, na.rm = T),
             est_sd = sd(meth_est, na.rm = T),
             est_min = min(meth_est, na.rm = T),
             est_max = max(meth_est, na.rm = T),
@@ -141,7 +141,6 @@ compute_ci_confidence = function(tumor_mat,
             )
         ) %>%
         mutate(
-            est_mu = .clamp_val(est_mu, 0, 1),
             ci_lower = .clamp_val(q025_tc, 0, 1),
             ci_upper = .clamp_val(q975_tc, 0, 1),
             est_min = .clamp_val(est_min, 0, 1),
@@ -149,6 +148,17 @@ compute_ci_confidence = function(tumor_mat,
         )
 
 
+    tc_est_ci = tc_est_ci %>%
+        inner_join(tc_full %>% select(-bt, est_mu = meth_est), by = "SampleName") %>%
+        select(SampleName,
+               est_mu,
+               est_sd,
+               est_min,
+               est_max,
+               q025_tc,
+               q975_tc,
+               ci_lower,
+               ci_upper)
 
     return(tc_est_ci)
 
