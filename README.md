@@ -15,12 +15,6 @@ MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.
 ![NEMO](./img/schematic.png) *Schematic of NEMO panel design,
 validation, and application*
 
-**Important note**: this is the internal and fully functional version of
-the repository. It includes the panel design, which is currently
-undisclosed.
-
-### Please do not share this repository outside the group without approval.
-
 ## Description
 
 This repository contains the required code to perform circulating Tumor
@@ -277,10 +271,10 @@ res
 #> # A tibble: 4 × 9
 #>   SampleName est_mu  est_sd est_min est_max q025_tc q975_tc ci_lower ci_upper
 #>   <chr>       <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>
-#> 1 HD1        0.0238 0.00852  0.0123  0.0323  0.0140  0.0323   0.0140   0.0323
-#> 2 NCI-H660   1      0        1       1       1       1        1        1     
-#> 3 PM155_P    1      0        1       1       1       1        1        1     
-#> 4 VCaP       1      0        1       1       1       1        1        1
+#> 1 HD1             0 0         0           0       0       0        0        0
+#> 2 NCI-H660        1 0.00270   0.981       1       1       1        1        1
+#> 3 PM155_P         1 0         1           1       1       1        1        1
+#> 4 VCaP            1 0         1           1       1       1        1        1
 ```
 
 As expected, the cfDNA sample from an healthy donor is estimated to have
@@ -330,16 +324,16 @@ result = compute_all(
 )
 
 result
-#>        immune       adeno         ne  rel_error  var_score SampleName       pes
-#> 1 0.967038401 0.008992159 0.02396944 0.07743826 0.03325618        HD1        NA
-#> 2 0.001612771 0.233911478 0.76447575 0.36486637 0.15923425   NCI-H660 0.7657107
-#> 3 0.002937494 0.491367063 0.50569544 0.36100924 0.13815563    PM155_P 0.5071853
-#> 4 0.000000000 0.886040605 0.11395940 0.25315665 0.10277464       VCaP 0.1139594
-#>      pes_lw    pes_up     tc_est      tc_lw      tc_up quality_flag
-#> 1        NA        NA 0.02378013 0.01399656 0.03227869        FALSE
-#> 2 0.7657107 0.7657107 1.00000000 1.00000000 1.00000000         TRUE
-#> 3 0.5071853 0.5071853 1.00000000 1.00000000 1.00000000         TRUE
-#> 4 0.1139594 0.1139594 1.00000000 1.00000000 1.00000000         TRUE
+#>        immune     adeno        ne rel_error var_score SampleName       pes
+#> 1 1.000000000        NA        NA        NA        NA        HD1        NA
+#> 2 0.001612771 0.2339115 0.7644758 0.3648664 0.1592343   NCI-H660 0.7657107
+#> 3 0.002937494 0.4913671 0.5056954 0.3610092 0.1381556    PM155_P 0.5071853
+#> 4 0.000000000 0.8860406 0.1139594 0.2531566 0.1027746       VCaP 0.1139594
+#>      pes_lw    pes_up tc_est tc_lw tc_up quality_flag
+#> 1        NA        NA      0     0     0        FALSE
+#> 2 0.7657107 0.7657107      1     1     1         TRUE
+#> 3 0.5071853 0.5071853      1     1     1         TRUE
+#> 4 0.1139594 0.1139594      1     1     1         TRUE
 ```
 
 The results report the relative contributions of the three expected
