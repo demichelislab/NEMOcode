@@ -5,10 +5,9 @@
 
 <!-- badges: start -->
 
-[![codecov](https://codecov.io/gh/GMFranceschini/NEMOcode/branch/master/graph/badge.svg?token=M6G0L06263)](https://codecov.io/gh/GMFranceschini/NEMOcode)
 [![License:
 MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7887998.svg)](https://doi.org/10.5281/zenodo.7887998)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8431083.svg)](https://doi.org/10.5281/zenodo.8431083)
 
 <!-- badges: end -->
 
@@ -44,11 +43,12 @@ its scope.
 Preprocessed data, including DNA methylation, counts for samples
 profiled with NEMO, and per-region DNA methylation values for all
 samples analyzed, are available in Zenodo
-[link](http://dx.doi.org/10.5281/zenodo.7887998). Raw WGBS data are
+[link](http://dx.doi.org/10.5281/zenodo.8431083). Raw WGBS data are
 available from dbgap (WGBS, phs001752.v2-ctDNA_NE_CRPC_v2). Raw
 sequencing data for samples profiled with NEMO are available upon
-request due to privacy concerns. All results from the paper can be
-produced using only DNA methylation counts data.
+request due to privacy concerns, but anonymized bam files and processed
+DNA methylation calls are available through GEO (GSE245745). All results
+from the paper can be produced using only DNA methylation counts data.
 
 A minimal guide to obtain NEMO estimation from raw data (DNA methylation
 counts from Bismark) is outlined below.
