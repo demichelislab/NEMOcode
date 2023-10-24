@@ -342,3 +342,44 @@ functions on the corresponding data deposited in
 [Zenodo](https://doi.org/10.5281/zenodo.7887998). Computed scores for
 analyzed samples are also available as Supplementary Data in our study
 (Franceschini et al., ...).
+
+
+## Docker
+
+A docker image containing `NEMOcode` and the required packages can be build using the following `Dockerfile`:
+
+```{docker, eval = FALSE}
+# Use the official R base image with version 4.1.2
+FROM r-base:4.1.2
+
+# Install system libraries required by certain R packages, including rstan and brms
+RUN apt-get update && apt-get install -y \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    make \
+    g++ \
+    libboost-all-dev
+
+# Configure RStan
+RUN echo 'CXX14 = g++ -std=c++1y -Wno-unused-variable -Wno-unused-function -fPIC' >> /etc/R/Makeconf
+
+# Install the tidyverse, devtools, rstan, and brms packages in R
+RUN R -e "options(repos = list(CRAN = 'https://cloud.r-project.org/')); \
+         install.packages(c('tidyverse', 'rstan', 'BiocManager', 'brms', 'remotes'), dependencies=TRUE)"
+RUN R -e "remotes::install_github('DesiQuintans/librarian')"
+RUN R -e "BiocManager::install(update=FALSE)"
+RUN R -e "BiocManager::install('Biobase', update=FALSE)"
+RUN R -e "librarian::shelf(GenomicRanges, rtracklayer, S4Vectors)"
+RUN R -e "remotes::install_github('demichelislab/NEMOcode', dependencies = TRUE)"
+
+# Set the working directory inside the container
+WORKDIR /workspace
+
+# Make this directory available to the host
+VOLUME /workspace
+
+# Keep the container running
+CMD ["R"]
+
+```

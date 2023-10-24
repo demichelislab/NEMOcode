@@ -78,7 +78,7 @@ compute_ci_confidence = function(tumor_mat,
                                  quant_prob = .05,
                                  frac_sub = .5) {
 
-    set.seed(123)
+    set.seed(1234)
 
     assertthat::are_equal(nrow(tumor_mat), nrow(control_mat))
     assertthat::are_equal(nrow(tumor_mat), nrow(reg_df))
