@@ -121,7 +121,7 @@ You can install the current version of NEMOcode from
 ``` r
 # install.packages("devtools")
 install.packages("brms")
-devtools::install_github("GMFranceschini/NEMOcode")
+devtools::install_github("demichelislab/NEMOcode")
 ```
 
 ### Requirements
