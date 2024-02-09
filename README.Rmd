@@ -345,9 +345,9 @@ analyzed samples are also available as Supplementary Data in our study
 
 ## Docker
 
-A docker image containing `NEMOcode` and the required packages can be build using the following `Dockerfile`:
+A singularity image containing `NEMOcode` and the required packages can be build using the following recipe:
 
-```{docker, eval = FALSE}
+```{singularity, eval = FALSE}
 Bootstrap: docker
 From: ubuntu:22.04
 IncludeCmd: yes

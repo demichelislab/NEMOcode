@@ -365,16 +365,13 @@ analyzed samples are also available as Supplementary Data in our study
 
 ## Docker
 
-A docker image containing `NEMOcode` and the required packages can be
-build using the following `Dockerfile`:
+A singularity image containing `NEMOcode` and the required packages can
+be build using the following recipe:
 
-``` docker
+``` singularity
 Bootstrap: docker
 From: ubuntu:22.04
 IncludeCmd: yes
-
-# make the image:
-# sudo singularity build R_v4.3.1.sif R_container_v4.3.1.recipe
 
 %environment
 R_VERSION=4.1.2
@@ -385,7 +382,7 @@ export LC_ALL=C
 export PATH=$PATH
 
 %labels
-Author Francesco Orlando (adapted from Federico Vannuccini)
+Author Francesco Orlando
 Version v1.0.0
 R_Version 4.2.2
 build_date 08/02/2024
