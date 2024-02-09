@@ -272,7 +272,7 @@ res
 #>   SampleName est_mu  est_sd est_min est_max q025_tc q975_tc ci_lower ci_upper
 #>   <chr>       <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>    <dbl>    <dbl>
 #> 1 HD1             0 0         0           0       0       0        0        0
-#> 2 NCI-H660        1 0.00270   0.981       1       1       1        1        1
+#> 2 NCI-H660        1 0.00125   0.991       1       1       1        1        1
 #> 3 PM155_P         1 0         1           1       1       1        1        1
 #> 4 VCaP            1 0         1           1       1       1        1        1
 ```
@@ -324,16 +324,16 @@ result = compute_all(
 )
 
 result
-#>        immune     adeno        ne rel_error var_score SampleName       pes
-#> 1 1.000000000        NA        NA        NA        NA        HD1        NA
-#> 2 0.001612771 0.2339115 0.7644758 0.3648664 0.1592343   NCI-H660 0.7657107
-#> 3 0.002937494 0.4913671 0.5056954 0.3610092 0.1381556    PM155_P 0.5071853
-#> 4 0.000000000 0.8860406 0.1139594 0.2531566 0.1027746       VCaP 0.1139594
+#>         immune     adeno        ne rel_error var_score SampleName       pes
+#> 1 1.0000000000        NA        NA        NA        NA        HD1        NA
+#> 2 0.0003966096 0.2369646 0.7626388 0.3647717 0.1508964   NCI-H660 0.7629414
+#> 3 0.0023765074 0.4889418 0.5086817 0.3617121 0.1398005    PM155_P 0.5098934
+#> 4 0.0000000000 0.8854295 0.1145705 0.2533096 0.1038627       VCaP 0.1145705
 #>      pes_lw    pes_up tc_est tc_lw tc_up quality_flag
 #> 1        NA        NA      0     0     0        FALSE
-#> 2 0.7657107 0.7657107      1     1     1         TRUE
-#> 3 0.5071853 0.5071853      1     1     1         TRUE
-#> 4 0.1139594 0.1139594      1     1     1         TRUE
+#> 2 0.7629414 0.7629414      1     1     1         TRUE
+#> 3 0.5098934 0.5098934      1     1     1         TRUE
+#> 4 0.1145705 0.1145705      1     1     1         TRUE
 ```
 
 The results report the relative contributions of the three expected
@@ -369,36 +369,74 @@ A docker image containing `NEMOcode` and the required packages can be
 build using the following `Dockerfile`:
 
 ``` docker
-# Use the official R base image with version 4.1.2
-FROM r-base:4.1.2
+Bootstrap: docker
+From: ubuntu:22.04
+IncludeCmd: yes
 
-# Install system libraries required by certain R packages, including rstan and brms
-RUN apt-get update && apt-get install -y \
+# make the image:
+# sudo singularity build R_v4.3.1.sif R_container_v4.3.1.recipe
+
+%environment
+R_VERSION=4.1.2
+export R_VERSION
+R_CONFIG_DIR=/etc/R/
+export R_CONFIG_DIR
+export LC_ALL=C
+export PATH=$PATH
+
+%labels
+Author Francesco Orlando (adapted from Federico Vannuccini)
+Version v1.0.0
+R_Version 4.2.2
+build_date 08/02/2024
+R_bioconductor True
+
+%apprun R
+exec R "$@"
+
+%apprun Rscript
+exec Rscript "$@"
+
+%runscript
+exec R "$@"
+
+%post
+  apt-get update
+  apt-get install -y apt-transport-https apt-utils software-properties-common
+  apt-get install -y add-apt-key
+  export DEBIAN_FRONTEND=noninteractive
+  ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+  apt-get install -y tzdata
+  dpkg-reconfigure --frontend noninteractive tzdata
+
+  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+  add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+  apt-get update
+
+  apt-get install -y gcc fort77 aptitude
+  aptitude install -y g++
+  aptitude install -y gfortran
+  apt-get install -y r-base r-base-dev
+
+  apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
     make \
     g++ \
-    libboost-all-dev
-
-# Configure RStan
-RUN echo 'CXX14 = g++ -std=c++1y -Wno-unused-variable -Wno-unused-function -fPIC' >> /etc/R/Makeconf
-
-# Install the tidyverse, devtools, rstan, and brms packages in R
-RUN R -e "options(repos = list(CRAN = 'https://cloud.r-project.org/')); \
+    libboost-all-dev \
+    libglpk-dev \
+    libgmp-dev \
+    libxml2-dev
+  echo 'CXX14 = g++ -std=c++1y -Wno-unused-variable -Wno-unused-function -fPIC' >> /etc/R/Makeconf
+  
+  # Install the tidyverse, devtools, rstan, and brms packages in R
+R -e "options(repos = list(CRAN = 'https://cloud.r-project.org/')); \
          install.packages(c('tidyverse', 'rstan', 'BiocManager', 'brms', 'remotes'), dependencies=TRUE)"
-RUN R -e "remotes::install_github('DesiQuintans/librarian')"
-RUN R -e "BiocManager::install(update=FALSE)"
-RUN R -e "BiocManager::install('Biobase', update=FALSE)"
-RUN R -e "librarian::shelf(GenomicRanges, rtracklayer, S4Vectors)"
-RUN R -e "remotes::install_github('demichelislab/NEMOcode', dependencies = TRUE)"
-
-# Set the working directory inside the container
-WORKDIR /workspace
-
-# Make this directory available to the host
-VOLUME /workspace
-
-# Keep the container running
-CMD ["R"]
+R -e "remotes::install_github('DesiQuintans/librarian')"
+R -e "install.packages('igraph', dependencies = TRUE)"
+R -e "BiocManager::install(update=FALSE)"
+R -e "BiocManager::install('Biobase', update=FALSE)"
+R -e "librarian::shelf(GenomicRanges, rtracklayer, S4Vectors)"
+R -e "remotes::install_github('demichelislab/NEMOcode', dependencies = TRUE)"
 ```
