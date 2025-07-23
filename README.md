@@ -107,8 +107,7 @@ likely fractions of each cell type. A strong prior is used for the
 healthy cfDNA signal, as it is equal to one minus the tumor content,
 while a non-informative prior is used for the NE and Adeno components.
 The relative error of the estimation is computed as the maximum standard
-error across NE and Adeno fractions, divided by the total tumor content
-(currently, this statististic is not used). Notice that the PE score is
+error across NE and Adeno fractions (currently, this statistic is not used - but could be useful to interpret signal stability). Notice that the PE score is
 not reliable when the tumor content is below 3%, while we recommend
 caution in interpreting the PE score between 3% and 10% of tumor
 content.
